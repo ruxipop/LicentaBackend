@@ -10,21 +10,16 @@ public class DataContext : DbContext
     
     public DbSet<User> Users { get; set; }
 
+    protected readonly IConfiguration Configuration;
 
-
-    public DataContext(IConfiguration configuration) { }
-
-    public DataContext(string connectionString)
+    public DataContext(IConfiguration configuration)
     {
-        this.connectionString = connectionString;
-    }
-    
-    public DataContext()
-    {
+        Configuration = configuration;
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
+        var connectionString = Configuration.GetConnectionString("Database");
         options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
     } 
     

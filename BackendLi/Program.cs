@@ -94,7 +94,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-using (var context = new DataContext(app.Configuration.GetConnectionString("Database")))
+using (var context = new DataContext(app.Configuration))
 {  
     if (context.Database.GetPendingMigrations().Any())
     {
