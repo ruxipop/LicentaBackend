@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "F1hAOXb2wf4RnjsMvqQtfBvLrnp1YgmKwf/jV2AAkM3EMI/wO0f2502LRMrRCpG/K+qAbVZLfLgEwvv6VLFh+A==",
+  "dgSpecHash": "gE1bb6jt9puUkPtmYTX0LXKDE0F0k1svU3LYV0x/vzET5ZIfUt3EovuMUwQhMNDDXPr0uIJG7WohljdVw0mmxw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\POU2CLJ\\Desktop\\BackendLi\\BackendLi\\BackendLi.csproj",
+  "projectFilePath": "C:\\Users\\POU2CLJ\\Desktop\\lic\\LicentaBackend\\BackendLi\\BackendLi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\POU2CLJ\\.nuget\\packages\\autofac\\6.4.0\\autofac.6.4.0.nupkg.sha512",
     "C:\\Users\\POU2CLJ\\.nuget\\packages\\autofac.extensions.dependencyinjection\\8.0.0\\autofac.extensions.dependencyinjection.8.0.0.nupkg.sha512",
