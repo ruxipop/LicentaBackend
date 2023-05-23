@@ -1,6 +1,6 @@
 namespace BackendLi.DataAccess;
 
-public interface IUnitOfWork
+public interface IUnitOfWork : IRepository, IDisposable
 {
     void Add<T>(T entity) where T : class;
     void AddRange<T>(IEnumerable<T> entities) where T : class;

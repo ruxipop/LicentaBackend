@@ -14,15 +14,28 @@ using System;
 [Service(typeof(IAuthenticationService))]
 public class AuthenticationService:IAuthenticationService
 {
+    
+  
     private readonly IRepository repository;
     private readonly IConfiguration configuration;
+    
+    
+    public AuthenticationService(IRepository repository, IConfiguration configuration)
+    {
+        this.repository = repository;
+        this.configuration = configuration;
+    }
     public LoginDetailsDto? Login(LoginDetails loginDetails)
     {
+        Console.WriteLine(repository==null);
+        Console.WriteLine(configuration==null);
         User? user = Authenticate(loginDetails);
         
         if (user != null)
         {
+            Console.WriteLine("eexi");
             string token = GenerateJSONWebToken(user);
+            Console.WriteLine(token);
             return new LoginDetailsDto
             {
                 Email= user.Email,
@@ -31,7 +44,7 @@ public class AuthenticationService:IAuthenticationService
                 AuthToken = token
             };
         }
-
+        Console.WriteLine("nu eexi");
         return null;
     }
     public void Logout(string tokenValue)
@@ -42,11 +55,15 @@ public class AuthenticationService:IAuthenticationService
 
     private User? Authenticate(LoginDetails loginDetails)
     {
+    
         using var sha256=SHA256.Create();
         var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(loginDetails.Password));
+      
         var enteredPassword = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+       
         User? currentUser = repository.GetEntities<User>()
             .FirstOrDefault(x => x.Email == loginDetails.Email && x.Password == enteredPassword);
+ 
         return currentUser;
     }
     private string GenerateJSONWebToken(User user)

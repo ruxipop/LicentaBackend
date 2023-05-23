@@ -65,10 +65,8 @@ builder.Services.AddSwaggerGen(options => {
 builder.Services.AddCors(options => options.AddPolicy(name: "ProjectOrigins", policy =>
 {
     policy.WithOrigins(
-        "http://*:4200",
-        "https://*:4200",
-        "https://ds202230643boancavladassignment1front.azurewebsites.net"
-    ).AllowAnyMethod().AllowAnyHeader();
+        "http://localhost:4200",
+        "https://*:4200").AllowAnyMethod().AllowAnyHeader();
 }));
 
 builder.Services.AddHangfire(x =>
@@ -94,14 +92,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-using (var context = new DataContext(app.Configuration))
-{  
+using (var context = new DataContext(app.Configuration.GetConnectionString("Database")))
+{
     if (context.Database.GetPendingMigrations().Any())
     {
         Console.WriteLine("Applying migrations...");
         context.Database.Migrate();
         Console.WriteLine("Migrations applied.");
-        Console.WriteLine("cadee2");
     }
    
 }

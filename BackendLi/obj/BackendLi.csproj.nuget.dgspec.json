@@ -49,6 +49,10 @@
               "target": "Package",
               "version": "[8.0.0, )"
             },
+            "EFBulkInsert": {
+              "target": "Package",
+              "version": "[0.5.0, )"
+            },
             "Hangfire": {
               "target": "Package",
               "version": "[1.8.1, )"
@@ -68,6 +72,10 @@
             "Microsoft.AspNetCore.Mvc.NewtonsoftJson": {
               "target": "Package",
               "version": "[6.0.10, )"
+            },
+            "Microsoft.Data.SqlClient": {
+              "target": "Package",
+              "version": "[5.1.0, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
