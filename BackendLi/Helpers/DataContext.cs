@@ -11,6 +11,7 @@ public class DataContext : DbContext
     
     public DbSet<User> Users { get; set; }
     public DbSet<Token> Token{ get; set; }
+    public DbSet<Follow> Follow{ get; set; }
 
 
     public DataContext(IConfiguration configuration) { }

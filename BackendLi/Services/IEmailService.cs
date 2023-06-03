@@ -1,3 +1,5 @@
+using BackendLi.Entities;
+
 namespace BackendLi.Services;
 
 public interface IEmailService
@@ -6,5 +8,10 @@ public interface IEmailService
     void AddEmailToken(string token, Boolean isValid, DateTime expirationDate);
     public DateTime getEmailTokenExpiration(string token);
 
-    public void SendEmail(string Email, String Link, string Username);
+    public void SendEmail(string Email, string Link, string Username);
+    public Boolean isEmailTokenInvalid(string Token);
+    
+    public void invalidateEmailToken(string Token);
+
+    public string decodeEmailToken(string Token);
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net.Mime;
 
 namespace BackendLi.Entities;
 
@@ -11,11 +12,21 @@ public class User
     public string Password { get; set; }
     public string Role { get; set; }
     public string Name { get; set; }
-  
+    public List<Image>? Images{ get; set; } 
+    // public int LocationId { get; set; }
+    // [ForeignKey("LocationId")] 
+    //
+    // public Location? Location { get; set; }
+    
+    
+    public string? BackgroundPhoto { get; set; }
+    public string? ProfilePhoto { get; set; }
 
     public User()
     {
-      
+        Images = new List<Image>();
     }
+
+  
 
 }

@@ -3,6 +3,7 @@ using System;
 using BackendLi.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendLi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20230602170050_MigrationName14")]
+    partial class MigrationName14
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,27 +72,6 @@ namespace BackendLi.Migrations
                         .IsUnique();
 
                     b.ToTable("editor");
-                });
-
-            modelBuilder.Entity("BackendLi.Entities.Follow", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<int>("FollowerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FollowingId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FollowerId");
-
-                    b.HasIndex("FollowingId");
-
-                    b.ToTable("follow");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Image", b =>
@@ -271,25 +252,6 @@ namespace BackendLi.Migrations
                     b.Navigation("Editor");
 
                     b.Navigation("Image");
-                });
-
-            modelBuilder.Entity("BackendLi.Entities.Follow", b =>
-                {
-                    b.HasOne("BackendLi.Entities.User", "Follower")
-                        .WithMany()
-                        .HasForeignKey("FollowerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BackendLi.Entities.User", "Following")
-                        .WithMany()
-                        .HasForeignKey("FollowingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Follower");
-
-                    b.Navigation("Following");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Image", b =>

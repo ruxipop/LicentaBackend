@@ -84,7 +84,7 @@ public class EmailService:IEmailService
             "  <p>We've received a request to reset your password.</p>\n" +
             "  <p>If you didn't make this request, then please ignore this notification. Otherwise, you can reset your password using this link: </p>\n" +
             "</br>\n" +
-            "  <a href=\""  +
+            "  <a href=\"" +Link +
             "\"> <button style=\"background-color:#619CE6;border-radius: 10px; color: white;\n" +
             "  font-size: 18px; font-weight: bold; height: 50px;\n" +
             "  width: 250px; border: 2px solid #619CE6FF; cursor:pointer\">RESET PASSWORD</button>\n" +
@@ -107,6 +107,56 @@ public class EmailService:IEmailService
         {
             Console.WriteLine("Error sending email: " + ex.Message);
         }
-    
-}
+    }
+
+    public Boolean isEmailTokenInvalid(string Token)
+    {
+        Token? token= _repository.GetEntities<Token>().FirstOrDefault(x => x.TokenValue == Token);
+        if (token == null)
+        {
+            //TODO :EXECPTIE
+            return false;//trebe exceptie
+        }
+
+        DateTimeOffset now = DateTimeOffset.UtcNow;
+        if (!token.IsValid)
+        {
+            return true;
+        }
+
+        
+        
+        Console.WriteLine(now);
+        Console.WriteLine(token.ExpirationDate);
+        Console.WriteLine(now>token.ExpirationDate);
+        if (now > token.ExpirationDate)
+        {
+            invalidateEmailToken(token.TokenValue);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void invalidateEmailToken(string Token)
+    {
+        Token? token= _repository.GetEntities<Token>().FirstOrDefault(x => x.TokenValue == Token);
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            token.IsValid = false;
+            unitOfWork.Update(token);
+            unitOfWork.SaveChanges();
+        }
+    }
+
+    public string decodeEmailToken(string Token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var decodedToken = tokenHandler.ReadJwtToken(Token);
+
+        var emailClaim = decodedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        
+        return emailClaim.Value;
+     
+    }
 }

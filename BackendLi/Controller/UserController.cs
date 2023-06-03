@@ -30,16 +30,15 @@ public class UserController:ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDetails loginDetails)
     {
-        Console.WriteLine(_authenticationService==null);
-        LoginDetailsDto? loginDetailsDto =  _authenticationService.Login(loginDetails);
+        Dictionary<string,string>? dictionary =  _authenticationService.Login(loginDetails);
 
-        if (loginDetailsDto != null)
+        if (dictionary != null)
         {
-            return Ok(loginDetailsDto);
+            return Ok(dictionary);
         }
         Console.WriteLine("sfarist");
 
-        return NotFound("User not found");
+        return BadRequest(new { error = "User not found" });
     }
 
     [AllowAnonymous]
@@ -82,5 +81,62 @@ public class UserController:ControllerBase
         }
         return Ok();
     }
+
+    [AllowAnonymous]
+    [HttpGet("verify-token")]
+    public IActionResult VerifyEmailToken( [FromQuery] string token)
+    {
+        Boolean isExpired = _emailService.isEmailTokenInvalid(token);
+        return !isExpired ? Ok("Token is valid!") : BadRequest("Token has expired!");
+    }
+
+    [AllowAnonymous]
+    [HttpGet("reset-password")]
+    public IActionResult ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
+    {
+        if (_emailService.isEmailTokenInvalid(resetPasswordDto.Token))
+        {
+            return BadRequest("Token has expired!");
+        }
+
+        string email = _emailService.decodeEmailToken(resetPasswordDto.Token);
+        _userService.ResetPassword(email,resetPasswordDto.NewPassword);
+        _emailService.invalidateEmailToken(resetPasswordDto.Token);
+        return Ok();
+    }
     
+    
+    [AllowAnonymous]
+    [HttpGet("{id}")]
+    public IActionResult GetUserById(int id)
+    {
+        User? user = _userService.GetUser(id);
+        if (user != null)
+        {
+            return Ok(user);
+        }
+
+        return NotFound("User not found");
+
+    }
+    
+    [AllowAnonymous]
+    [HttpGet("getNbImages/{id}")]
+    public IActionResult GetNbImages(int id)
+    {
+        var number = _userService.GetNumberOfImagesForUser(id);
+        return Ok(number);
+    }
+    
+    [AllowAnonymous]
+    [HttpGet("me")]
+    public IActionResult GetUserFromToken( )
+    {
+        User? currentUser = _userService.GetCurrentUser(Request);
+        if (currentUser != null)
+        {
+            return Ok(currentUser);
+        }
+        return BadRequest(new { error = "User not found" });
+    }
 }

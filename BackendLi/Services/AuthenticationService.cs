@@ -25,26 +25,19 @@ public class AuthenticationService:IAuthenticationService
         this.repository = repository;
         this.configuration = configuration;
     }
-    public LoginDetailsDto? Login(LoginDetails loginDetails)
+    public Dictionary<string, string>? Login(LoginDetails loginDetails)
     {
-        Console.WriteLine(repository==null);
-        Console.WriteLine(configuration==null);
+       
         User? user = Authenticate(loginDetails);
         
         if (user != null)
         {
-            Console.WriteLine("eexi");
             string token = GenerateJSONWebToken(user);
-            Console.WriteLine(token);
-            return new LoginDetailsDto
-            {
-                Email= user.Email,
-                Password = user.Password,
-                Role = user.Role,
-                AuthToken = token
-            };
+            Dictionary<string, string> tokens = new Dictionary<string, string>();
+            tokens.Add("access_token", token);
+            tokens.Add("refresh_token",token);
+            return tokens;
         }
-        Console.WriteLine("nu eexi");
         return null;
     }
     public void Logout(string tokenValue)
