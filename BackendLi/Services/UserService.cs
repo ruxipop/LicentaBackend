@@ -77,7 +77,7 @@ public class UserService: IUserService
         var decodedToken = tokenHandler.ReadJwtToken(accessToken);
         string userId = decodedToken.Subject;
 
-        var emailClaim = decodedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var emailClaim = decodedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
         return repository.GetEntities<User>().FirstOrDefault(u => u.Email == emailClaim);
     }
 }

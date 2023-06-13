@@ -7,7 +7,7 @@ namespace BackendLi.Entities
     public class Token
     {
         public int Id { get; set; }
-        public string TokenValue { get; set; }
+        public string? TokenValue { get; set; }
         public bool IsValid { get; set; }
         public DateTime ExpirationDate { get; set; }
 

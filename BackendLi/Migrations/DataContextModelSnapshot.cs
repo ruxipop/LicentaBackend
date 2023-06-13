@@ -19,6 +19,68 @@ namespace BackendLi.Migrations
                 .HasAnnotation("ProductVersion", "6.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
+            modelBuilder.Entity("BackendLi.Entities.ChatMessage", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("chat");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.ChatMessageSender", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("chat_sender");
+                });
+
             modelBuilder.Entity("BackendLi.Entities.Comment", b =>
                 {
                     b.Property<int>("Id")
@@ -93,6 +155,33 @@ namespace BackendLi.Migrations
                     b.ToTable("follow");
                 });
 
+            modelBuilder.Entity("BackendLi.Entities.Gallery", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("gallery");
+                });
+
             modelBuilder.Entity("BackendLi.Entities.Image", b =>
                 {
                     b.Property<int>("Id")
@@ -109,6 +198,9 @@ namespace BackendLi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("GalleryId")
+                        .HasColumnType("int");
+
                     b.Property<int>("Height")
                         .HasColumnType("int");
 
@@ -116,7 +208,7 @@ namespace BackendLi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("LocationId")
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Taked")
@@ -135,6 +227,8 @@ namespace BackendLi.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("AutorId");
+
+                    b.HasIndex("GalleryId");
 
                     b.HasIndex("LocationId");
 
@@ -194,7 +288,6 @@ namespace BackendLi.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("TokenValue")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -226,13 +319,61 @@ namespace BackendLi.Migrations
                     b.Property<string>("ProfilePhoto")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("RefreshTokenExpiryTime")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<string>("Role")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Username")
                         .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
                     b.ToTable("users");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.ChatMessage", b =>
+                {
+                    b.HasOne("BackendLi.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendLi.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.ChatMessageSender", b =>
+                {
+                    b.HasOne("BackendLi.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendLi.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Comment", b =>
@@ -292,6 +433,15 @@ namespace BackendLi.Migrations
                     b.Navigation("Following");
                 });
 
+            modelBuilder.Entity("BackendLi.Entities.Gallery", b =>
+                {
+                    b.HasOne("BackendLi.Entities.User", "User")
+                        .WithMany("Galleries")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BackendLi.Entities.Image", b =>
                 {
                     b.HasOne("BackendLi.Entities.User", "Autor")
@@ -300,13 +450,17 @@ namespace BackendLi.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("BackendLi.Entities.Gallery", "Gallery")
+                        .WithMany("Images")
+                        .HasForeignKey("GalleryId");
+
                     b.HasOne("BackendLi.Entities.Location", "Location")
                         .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LocationId");
 
                     b.Navigation("Autor");
+
+                    b.Navigation("Gallery");
 
                     b.Navigation("Location");
                 });
@@ -330,6 +484,11 @@ namespace BackendLi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BackendLi.Entities.Gallery", b =>
+                {
+                    b.Navigation("Images");
+                });
+
             modelBuilder.Entity("BackendLi.Entities.Image", b =>
                 {
                     b.Navigation("Comments");
@@ -341,6 +500,8 @@ namespace BackendLi.Migrations
 
             modelBuilder.Entity("BackendLi.Entities.User", b =>
                 {
+                    b.Navigation("Galleries");
+
                     b.Navigation("Images");
                 });
 #pragma warning restore 612, 618

@@ -27,14 +27,31 @@ public class FollowController:ControllerBase
         return Ok(followers);
     }
 
+    [AllowAnonymous]
+    [HttpGet("getFollowersNb/{userId}")]
+    public IActionResult GetAllFollowersNbForUser(int userId)
+    {
+        var followers = _followService.GetAllFollowersForUser(userId);
+        return Ok(followers.Count());
+    }
     
-    // [AllowAnonymous]
-    // [HttpGet("getFollowing/{userId}")]
-    // public IActionResult GetAllFollowing(int userId)
-    // {
-    //     var following = _followService.GetAllFollowing(userId);
-    //     return Ok(following);
-    // }
+    [AllowAnonymous]
+    [HttpGet("getFollowingNb/{userId}")]
+    public IActionResult GetAllFollowingNb(int userId)
+    {
+        var following = _followService.GetAllFollowing(userId);
+        return Ok(following.Count());
+    }
+
+    [AllowAnonymous]
+    [HttpGet("getAllFollowing")]
+
+    public IActionResult GetAllFollowing([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] string  ? searchTerm)
+    {
+        Console.WriteLine(searchTerm);
+        var following = _followService.GetAllFollowingPage(id, pageNb, pageSize,searchTerm);
+        return Ok(following);
+    }
     
     [Authorize]
     [HttpDelete]

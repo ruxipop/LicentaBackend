@@ -26,11 +26,37 @@ public class FollowService:IFollowService
             .Where(i => i.FollowingId == userId).ToList();
         
     }
+    public IEnumerable<Follow> GetAllFollowersForUserPage(int userId,int pageNb,int pageSize)
+    {
+        return _repository.GetEntities<Follow>().Include(i => i.Follower)
+            .Where(i => i.FollowingId == userId).Skip((pageNb - 1) * pageSize).Take(pageSize)
+           
+            .ToList();
+        
+    }
+    
+    public IEnumerable<Follow> GetAllFollowingPage(int userId, int pageNb, int pageSize, string? searchTerm)
+    {
+        searchTerm = string.IsNullOrEmpty(searchTerm) ? null : searchTerm.ToLower();
+
+        return _repository.GetEntities<Follow>()
+            .Include(i => i.Following)
+            .Include(i => i.Follower)
+            .Where(i => i.FollowerId == userId &&
+                        (searchTerm == null || 
+                         i.Following.Name.ToLower().Contains(searchTerm) ||
+                         i.Following.Username.ToLower().Contains(searchTerm)))
+            .Skip((pageNb - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+        
+    }
+
 
     //pe cine urmareste el
     public IEnumerable<Follow> GetAllFollowing(int userId)
     {
-        return _repository.GetEntities<Follow>().Where(i => i.FollowerId == userId)
+        return _repository.GetEntities<Follow>().Include(i => i.Following).Include(i=>i.Follower).Where(i => i.FollowerId == userId)
            
             .ToList(); ;
     }

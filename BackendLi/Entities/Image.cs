@@ -20,10 +20,11 @@ public class Image
 
     public DateTime Taked{ get; set; }
     public DateTime Uploaded { get; set; }
-    public int LocationId { get; set; }
     [ForeignKey("LocationId")] 
 
-    public Location Location { get; set; }
+    public int? LocationId { get; set; }
+    
+    public Location? Location { get; set; }
     public string ImageUrl { get; set; }
     public ImageCategory Category { get; set; } 
     public int Width { get; set; }
@@ -32,6 +33,11 @@ public class Image
 
 
     public List<Like> Likes { get; set; }
+    
+    
+    [ForeignKey("Gallery")]
+    public int? GalleryId { get; set; }
+    public virtual Gallery? Gallery { get; set; }
 
 
     public ICollection<Comment> Comments { get; set; }

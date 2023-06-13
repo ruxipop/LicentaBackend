@@ -21,7 +21,7 @@ public class CommentController:ControllerBase
 
     
     [HttpPost("addComment")]
-    [AllowAnonymous]
+    [Authorize]
     public void AddComment([FromBody] Comment comment)
     {
         Console.WriteLine("cc"+comment.CreatedAt);
@@ -30,7 +30,7 @@ public class CommentController:ControllerBase
         // return Ok();
     }
     
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet("{imageId}")]
     public IEnumerable<Comment> GetComments(int imageId)
     {

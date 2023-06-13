@@ -179,3 +179,6 @@ C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\runtimes\
 C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
 C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\System.Net.WebSockets.WebSocketProtocol.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\sealc.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\SEALNet.dll

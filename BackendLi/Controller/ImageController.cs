@@ -88,7 +88,7 @@ public class ImageController : ControllerBase
         return Ok(new { imageType = imageType });
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet("getImagesByAuthorId/{id}")]
     public IEnumerable<Image> GetImagesByType(int id)
     {
@@ -96,30 +96,69 @@ public class ImageController : ControllerBase
         return _imageService.GetImagesByAuthorId(id);
     }
     
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet("getImageLikes")]
-    public IActionResult GetImageLikes([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] int userId)
+    public IActionResult GetImageLikes([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] int userId,[FromQuery] string type)
     {
-        List<LikesModalDto> likesModalDtos = new List<LikesModalDto>();
-        var likes= _imageService.GetImageLikes(pageNb, pageSize, id).ToList();
-
-        var following = _followService.GetAllFollowing(userId).ToList();
-
-        foreach (var like in likes)
+        List<ModalDto> likesModalDtos = new List<ModalDto>();
+        if (type == "Likes")
         {
-            if (following.Any(i => i.FollowingId == like.UserId))
+            var likes= _imageService.GetImageLikes(pageNb, pageSize, id).ToList();
+
+            var following = _followService.GetAllFollowing(userId).ToList();
+
+            foreach (var like in likes)
             {
-                likesModalDtos.Add(new LikesModalDto(true,like));
+                if (following.Any(i => i.FollowingId == like.UserId))
+                {
+                    likesModalDtos.Add(new ModalDto(true,like.User));
+                }
+                else
+                {
+                    likesModalDtos.Add(new ModalDto(false,like.User));
+                }
             }
-            else
+        }else if(type=="Followers")
+
+        {
+            var followers = _followService.GetAllFollowersForUserPage(id,pageNb,pageSize).ToList();
+            var following = _followService.GetAllFollowing(userId).ToList();
+
+            foreach (var follower in followers)
             {
-                likesModalDtos.Add(new LikesModalDto(false,like));
-            }
+                if (following.Any(i => i.FollowingId == follower.FollowerId))
+                {
+                    likesModalDtos.Add(new ModalDto(true,follower.Follower));
+                }
+                else
+                {
+                    likesModalDtos.Add(new ModalDto(false,follower.Follower));
+                }
+            }  
+        }else if (type ==  "Following")
+        {
+            var followers = _followService.GetAllFollowingPage(id,pageNb,pageSize,null).ToList();
+            var following = _followService.GetAllFollowing(userId).ToList();
+
+            foreach (var follower in followers)
+            {
+                if (following.Any(i => i.FollowingId == follower.FollowingId))
+                {
+                    likesModalDtos.Add(new ModalDto(true,follower.Following));
+                }
+                else
+                {
+                    likesModalDtos.Add(new ModalDto(false,follower.Following));
+                }
+            }   
+
+          
         }
+
         return Ok(likesModalDtos);
     }
     
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet("getImagesUser")]
     public IActionResult GetImagesByUserId([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize)
     {
@@ -128,7 +167,7 @@ public class ImageController : ControllerBase
         return Ok(likes);
     }
     
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet("getImagesLiked")]
     public IActionResult GetImagesLikedByUserId([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize)
     {

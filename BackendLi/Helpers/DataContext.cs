@@ -12,7 +12,10 @@ public class DataContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Token> Token{ get; set; }
     public DbSet<Follow> Follow{ get; set; }
-
+    public DbSet<Gallery> Gallery{ get; set; }
+    public DbSet<ChatMessage> Chat{ get; set; }
+    public DbSet<ChatMessageSender> ChatSender{ get; set; }
+    public DbSet<Location> Location{ get; set; }
 
     public DataContext(IConfiguration configuration) { }
 

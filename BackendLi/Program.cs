@@ -2,6 +2,7 @@ using System.Text;
 using Autofac.Extensions.DependencyInjection;
 using BackendLi.DataAccess;
 using BackendLi.Helpers;
+using BackendLi.Hubs;
 using BackendLi.Services;
 using Microsoft.AspNetCore.Mvc;
 using Hangfire;
@@ -66,9 +67,13 @@ builder.Services.AddCors(options => options.AddPolicy(name: "ProjectOrigins", po
 {
     policy.WithOrigins(
         "http://localhost:4200",
-        "https://*:4200").AllowAnyMethod().AllowAnyHeader();
+        "https://*:4200").AllowAnyMethod().AllowAnyHeader().AllowCredentials();
 }));
 
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
 builder.Services.AddHangfire(x =>
 {
     x.UseSqlServerStorage(builder.Configuration.GetConnectionString("Database"));
@@ -90,8 +95,15 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 
 app.UseAuthorization();
-
 app.MapControllers();
+app.MapHub<ChatHub>("/chatsocket");
+
+// app.UseEndpoints(endpoints =>
+// {
+//     // endpoints.MapControllers();
+//     
+//     endpoints.MapHub<ChatHub>("/chatsocket");     // path will look like this https://localhost:44379/chatsocket 
+// });
 using (var context = new DataContext(app.Configuration.GetConnectionString("Database")))
 {
     if (context.Database.GetPendingMigrations().Any())

@@ -10,5 +10,7 @@ public interface IFollowService
     public SuccessResponseDto DeleteFollow(int followerId, int followingId);
     public SuccessResponseDto AddFollow(User user, int followingId);
     public bool IsUserFollowing(int followerId, int followingId);
+    public IEnumerable<Follow> GetAllFollowersForUserPage(int userId, int pageNb, int pageSize);
+    public IEnumerable<Follow> GetAllFollowingPage(int userId, int pageNb, int pageSize, string? searchTerm);
 
 }

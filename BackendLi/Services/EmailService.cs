@@ -30,7 +30,7 @@ public class EmailService:IEmailService
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
         var claims = new[]
         {
-            new Claim(ClaimTypes.NameIdentifier, Email),
+            new Claim(ClaimTypes.Name, Email),
         
         };
         var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
@@ -154,7 +154,7 @@ public class EmailService:IEmailService
         var tokenHandler = new JwtSecurityTokenHandler();
         var decodedToken = tokenHandler.ReadJwtToken(Token);
 
-        var emailClaim = decodedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+        var emailClaim = decodedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name);
         
         return emailClaim.Value;
      

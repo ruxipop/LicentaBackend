@@ -30,22 +30,23 @@ public class UserController:ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDetails loginDetails)
     {
-        Dictionary<string,string>? dictionary =  _authenticationService.Login(loginDetails);
-
-        if (dictionary != null)
-        {
-            return Ok(dictionary);
-        }
-        Console.WriteLine("sfarist");
-
-        return BadRequest(new { error = "User not found" });
+       var dictionary =  _authenticationService.Login(loginDetails);
+Console.WriteLine(dictionary);
+     
+        return Ok(dictionary);
+        
+     
     }
 
     [AllowAnonymous]
     [HttpPost("register")]
     public IActionResult Register([FromBody] User user)
     {
-        Console.WriteLine("sa");
+       User? existUser = _repository.GetEntities<User>().FirstOrDefault(x => x.Email == user.Email);
+        // if (user==null)
+        // {
+        //     return BadRequest("User already exists");
+        // }
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
             using (var sha256 = SHA256.Create())
@@ -59,6 +60,7 @@ public class UserController:ControllerBase
         }
 
         return Ok();
+
     }
 
     [AllowAnonymous]
@@ -128,15 +130,76 @@ public class UserController:ControllerBase
         return Ok(number);
     }
     
-    [AllowAnonymous]
+    [Authorize]
     [HttpGet("me")]
     public IActionResult GetUserFromToken( )
     {
+        Console.WriteLine("intra in au");
         User? currentUser = _userService.GetCurrentUser(Request);
         if (currentUser != null)
         {
+            Console.WriteLine("id"+currentUser.Id);
             return Ok(currentUser);
         }
         return BadRequest(new { error = "User not found" });
     }
+
+    [HttpPost("refresh-token")]
+    public IActionResult RefreshToken(TokenApiDto tokenApiModel)
+    {
+        Console.WriteLine(tokenApiModel.AccessToken);
+        Console.WriteLine(tokenApiModel.RefreshToken);
+         Console.WriteLine("ce masa");
+        string accessToken = tokenApiModel.AccessToken;
+        string refreshToken = tokenApiModel.RefreshToken;
+        var principal = _authenticationService.GetPrincipalFromExpiredToken(accessToken);
+        var email = principal.Identity.Name;
+        var user = _userService.getUserByEmail(email);
+        Console.WriteLine("o trecut");
+        if (user==null)
+        {
+            Console.WriteLine(1);
+            return BadRequest("User Null");
+
+        }
+
+        if (user.RefreshToken != refreshToken)
+        {
+            Console.WriteLine(user.RefreshToken);
+            Console.WriteLine(refreshToken);
+
+            return BadRequest("refrskToken");
+
+        }
+
+        if (user.RefreshTokenExpiryTime <= DateTime.Now)
+        {
+            Console.WriteLine(DateTime.Now);
+            Console.WriteLine(3);
+            Console.WriteLine(user.RefreshTokenExpiryTime);
+            return BadRequest("data");
+        }
+
+        if (user==null|| user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            return BadRequest("Invalid client request");
+        var newAccessToken = _authenticationService.GenerateAccessToken(principal.Claims);
+        var newRefreshToken = _authenticationService.GenerateRefreshToken();
+        Console.WriteLine("aici crapa????");
+        user.RefreshToken = newRefreshToken;
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+            unitOfWork.Update(user);
+            unitOfWork.SaveChanges();
+        }
+        return Ok(new TokenApiDto()
+        {
+            AccessToken = newAccessToken,
+            RefreshToken = newRefreshToken
+        });
+    }
+   
+
+
 }
