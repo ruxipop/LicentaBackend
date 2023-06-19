@@ -1,4 +1,7 @@
+using System.Buffers.Text;
 using System.Net.Mime;
+using System.Text;
+using System.Text.RegularExpressions;
 using BackendLi.DataAccess;
 using BackendLi.DataAccess.Enums;
 using BackendLi.DTOs;
@@ -6,6 +9,14 @@ using BackendLi.Entities;
 using BackendLi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.IO;
+using System.Text;
+using System.Text.RegularExpressions;
+
+using Firebase;
+using Firebase.Auth;
+using Firebase.Storage;
 
 namespace BackendLi.Controller;
 
@@ -16,10 +27,12 @@ public class ImageController : ControllerBase
 
     private readonly IImageService _imageService;
     private readonly IFollowService _followService;
-    public ImageController(IImageService imageService,IFollowService followService)
+    private readonly IWritePhotoService _writePhotoService;
+    public ImageController(IImageService imageService,IFollowService followService,IWritePhotoService writePhotoService)
     {
         _imageService = imageService;
         _followService = followService;
+        _writePhotoService = writePhotoService;
     }
 
     [AllowAnonymous]
@@ -48,7 +61,7 @@ public class ImageController : ControllerBase
     [HttpGet("pages")]
     public IActionResult GetImages([FromQuery] int pageNb, [FromQuery] int pageSize, [FromQuery] string type, [FromQuery] string? category)
     {
-        Console.WriteLine(category);
+        
 
         List<string> categories = new List<string>();
         if (!string.IsNullOrEmpty(category))
@@ -89,11 +102,11 @@ public class ImageController : ControllerBase
     }
 
     [Authorize]
-    [HttpGet("getImagesByAuthorId/{id}")]
-    public IEnumerable<Image> GetImagesByType(int id)
+    [HttpGet("getImagesByAuthorId")]
+    public IEnumerable<Image> GetImagesByType([FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] int userId)
     {
         Console.WriteLine("intruuuuu ");
-        return _imageService.GetImagesByAuthorId(id);
+        return _imageService.GetImagesByAuthorId(pageNb,pageSize,userId);
     }
     
     [Authorize]
@@ -174,5 +187,30 @@ public class ImageController : ControllerBase
 
         var likes = _imageService.GetLikedImagesByUser(id, pageNb, pageSize);
         return Ok(likes);
+    }
+
+
+    [HttpPost("create")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Create([FromBody] Image image)
+    {   
+
+    
+          image.ImageUrl = _writePhotoService.createPhoto(image.ImageUrl);
+        _imageService.CreateImage(image);
+         
+
+      return Ok();
+
+    }
+    
+    [HttpDelete("{id}")]
+    [AllowAnonymous]
+    public IActionResult DeleteImage(int id)
+    {
+        
+        _imageService.DeleteImage(id);
+        return Ok(new SuccessResponseDto("Your image has been deleted"));
+
     }
 }

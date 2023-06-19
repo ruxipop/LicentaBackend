@@ -169,10 +169,13 @@ public class ImageService:IImageService
         return popularImages.Any(image => image.Id == imageId);
     }
     
-    public IEnumerable<Image> GetImagesByAuthorId(int authorId)
+   public IEnumerable<Image> GetImagesByAuthorId(int pageNb,int pageSize,int authorId)
+
     {
         return _repository.GetEntities<Image>()
             .Where(i => i.Autor.Id == authorId)
+            .Skip((pageNb - 1) * pageSize).Take(pageSize)
+           
             .ToList();
     }
 
@@ -192,5 +195,32 @@ public class ImageService:IImageService
             .Skip((pageNb - 1) * pageSize)
             .Take(pageSize)
             .ToList();
+    }
+    
+    
+    
+    public void CreateImage(Image image)
+    {
+      
+        Console.WriteLine("ajung");
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            unitOfWork.Add(image);
+            unitOfWork.SaveChanges();
+                
+        }
+        
+    }
+
+    public void DeleteImage(int id)
+    {
+        var image = _repository.GetEntities<Image>().FirstOrDefault(i => i.Id == id);
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            unitOfWork.Delete(image!);
+            unitOfWork.SaveChanges();
+                
+        }
+
     }
 }

@@ -4,13 +4,13 @@
 
 namespace BackendLi.Migrations
 {
-    public partial class MigrationName89 : Migration
+    public partial class MigrationName109 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
                 name: "Description",
-                table: "gallery",
+                table: "users",
                 type: "longtext",
                 nullable: false)
                 .Annotation("MySql:CharSet", "utf8mb4");
@@ -20,7 +20,7 @@ namespace BackendLi.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "Description",
-                table: "gallery");
+                table: "users");
         }
     }
 }

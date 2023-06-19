@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BackendLi.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230612173435_MigrationName51")]
-    partial class MigrationName51
+    [Migration("20230617010740_MigrationName109")]
+    partial class MigrationName109
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -163,8 +163,16 @@ namespace BackendLi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<int>("Name")
-                        .HasColumnType("int");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<bool>("IsPrivate")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<int?>("UserId")
                         .HasColumnType("int");
@@ -192,7 +200,7 @@ namespace BackendLi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("GalleryId")
+                    b.Property<int?>("GalleryId")
                         .HasColumnType("int");
 
                     b.Property<int>("Height")
@@ -202,7 +210,7 @@ namespace BackendLi.Migrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<int>("LocationId")
+                    b.Property<int?>("LocationId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("Taked")
@@ -269,6 +277,37 @@ namespace BackendLi.Migrations
                     b.ToTable("location");
                 });
 
+            modelBuilder.Entity("BackendLi.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("notification");
+                });
+
             modelBuilder.Entity("BackendLi.Entities.Token", b =>
                 {
                     b.Property<int>("Id")
@@ -282,7 +321,6 @@ namespace BackendLi.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("TokenValue")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
@@ -299,9 +337,16 @@ namespace BackendLi.Migrations
                     b.Property<string>("BackgroundPhoto")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("LocationId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -329,6 +374,8 @@ namespace BackendLi.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("users");
                 });
@@ -447,15 +494,11 @@ namespace BackendLi.Migrations
 
                     b.HasOne("BackendLi.Entities.Gallery", "Gallery")
                         .WithMany("Images")
-                        .HasForeignKey("GalleryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GalleryId");
 
                     b.HasOne("BackendLi.Entities.Location", "Location")
                         .WithMany()
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("LocationId");
 
                     b.Navigation("Autor");
 
@@ -481,6 +524,34 @@ namespace BackendLi.Migrations
                     b.Navigation("Image");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.Notification", b =>
+                {
+                    b.HasOne("BackendLi.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendLi.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.User", b =>
+                {
+                    b.HasOne("BackendLi.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Gallery", b =>

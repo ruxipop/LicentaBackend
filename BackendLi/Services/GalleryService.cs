@@ -1,4 +1,5 @@
 using BackendLi.DataAccess;
+using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Entities.Attributes;
 using Microsoft.EntityFrameworkCore;
@@ -17,7 +18,7 @@ public class GalleryService :IGalleryService
     {
         _repository = repository;
     }
-    public Gallery? getGalleryById(int id)
+    public Gallery? GetGalleryById(int id)
     {
         return _repository.GetEntities<Gallery>()
             .Include(x => x.Images!)
@@ -51,5 +52,73 @@ public class GalleryService :IGalleryService
         }
         
     } 
+    
+    
+    public IEnumerable<Gallery> GetAllGalleries(int userId,int pageNb,int pageSize, string? searchTerm)
 
+    
+        {
+            searchTerm = string.IsNullOrEmpty(searchTerm) ? null : searchTerm.ToLower();
+
+            return _repository.GetEntities<Gallery>()
+                .Where(g=>g.UserId==userId)
+                .Include(x => x.Images!)
+                .ThenInclude(i => i.Autor).Include(u=>u.User!).Where(i=>(searchTerm ==null || i.Name.Contains(searchTerm)))
+                
+                
+                                 .Skip((pageNb - 1) * pageSize)
+                                 .Take(pageSize)
+                                 .ToList();
+            
+    }
+
+    public SuccessResponseDto AddGalleryToImage(Image image, Gallery gallery)
+    {
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            image.GalleryId = gallery.Id;
+            unitOfWork.Update(image);
+            unitOfWork.SaveChanges();
+        }
+        return new SuccessResponseDto("Photo successfully added!");
+
+    }
+
+    public SuccessResponseDto RemoveImageFromGallery(Image image, Gallery gallery)
+    {
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            image.GalleryId = null;
+            unitOfWork.Update(image);
+            unitOfWork.SaveChanges();
+        }
+        return new SuccessResponseDto("Photo was removed from Gallery!");
+    }
+
+    public void DeleteGallery(int id)
+    {
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            var gallery = _repository.GetEntities<Gallery>().FirstOrDefault(g => g.Id == id);
+            if (gallery != null)
+            {
+                var images = _repository.GetEntities<Image>().Where(i => i.GalleryId == id);
+                foreach (var image in images)
+                {
+                    image.GalleryId = null;
+                    unitOfWork.Update(image);
+                    unitOfWork.SaveChanges();
+                }
+             
+            }
+            unitOfWork.Delete(gallery!);
+            unitOfWork.SaveChanges();
+        }
+    
+    }
+    
+
+
+
+    
 }

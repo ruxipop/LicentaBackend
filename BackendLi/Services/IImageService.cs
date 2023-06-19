@@ -10,9 +10,14 @@ public interface IImageService
    Image? GetImageById(int id);
    IEnumerable<Image> GetImagesByTypeAndCategory(string type,List<string>?  category);
    string GetImageType(int id);
-   IEnumerable<Image> GetImagesByAuthorId(int authorId);
+   IEnumerable<Image> GetImagesByAuthorId(int pageNb,int pageSize,int authorId);
 
    IEnumerable<Like> GetImageLikes(int pageNb, int pageSize, int imageId);
    IEnumerable<Image> GetImagesByUserId(int userId, int pageNb, int pageSize);
    IEnumerable<Image> GetLikedImagesByUser(int userId, int pageNb, int pageSize);
+
+   public void CreateImage(Image image);
+   public void DeleteImage(int id);
+
+
 }

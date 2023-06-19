@@ -1,11 +1,12 @@
+using BackendLi.DTOs;
 using BackendLi.Entities;
 
 namespace BackendLi.Services;
 
 public interface IUserService
 {
-    
-    User? GetUser(int UserId);
+    public void UpdateUser(UserDto userDto);
+        User? GetUser(int UserId);
 
     User getUserByEmail(string Email);
     

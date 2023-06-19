@@ -2,11 +2,10 @@ namespace BackendLi.DTOs;
 
 public class SuccessResponseDto
 {
-    private String message;
-
+    public string Message { get; set; }
 
     public SuccessResponseDto(string message)
     {
-        this.message = message;
+        Message = message;
     }
 }

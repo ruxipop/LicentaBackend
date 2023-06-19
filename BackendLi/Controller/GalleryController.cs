@@ -1,4 +1,5 @@
 using BackendLi.DataAccess;
+using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -19,9 +20,9 @@ public class GalleryController:ControllerBase
 
     [HttpGet("{id}")]
     [AllowAnonymous]
-    public IActionResult getGalleryById(int id)
+    public IActionResult GetGalleryById(int id)
     {
-        var gallery = _galleryService.getGalleryById(id);
+        var gallery = _galleryService.GetGalleryById(id);
         if (gallery != null)
         {
             return Ok(gallery);
@@ -30,6 +31,15 @@ public class GalleryController:ControllerBase
         return NotFound();
     }
     
+    [HttpGet("allGalleries")]
+    [AllowAnonymous]
+    public IActionResult GetAllGalleries([FromQuery] int userId,[FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] string  ? searchTerm)
+    {
+        var galleries = _galleryService.GetAllGalleries(userId, pageNb, pageSize,searchTerm);
+      
+            return Ok(galleries);
+        
+    }
     
     [HttpPut("update")]
     [AllowAnonymous]
@@ -46,11 +56,39 @@ public class GalleryController:ControllerBase
     {
         Console.WriteLine("sal");
         _galleryService.CreateGallery(gallery);
+        var response = new { Id = gallery.Id };
+        return Ok(gallery);
 
+    }
     
-            // Returnați ID-ul componentei într-un obiect de răspuns
-            var response = new { Id = gallery.Id };
-        return Ok(response);
+    [HttpPost("addPhoto")]
+    [AllowAnonymous]
+    public IActionResult AddPhoto([FromBody] ImageGalleryDto imageGalleryDto)
+    {
+
+      
+
+        return Ok(_galleryService.AddGalleryToImage(imageGalleryDto.Image, imageGalleryDto.Gallery));
+
+    }
+    
+    [HttpPost("removePhoto")]
+    [AllowAnonymous]
+    public IActionResult RemovePhoto([FromBody] ImageGalleryDto imageGalleryDto)
+    {
+        
+
+        return Ok(_galleryService.RemoveImageFromGallery(imageGalleryDto.Image,imageGalleryDto.Gallery));
+
+    }
+    
+    [HttpDelete("{id}")]
+    [AllowAnonymous]
+    public IActionResult DeleteGallery(int id)
+    {
+        
+_galleryService.DeleteGallery(id);
+return Ok(new SuccessResponseDto("Your gallery has been deleted"));
 
     }
 }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BackendLi.Migrations
 {
-    public partial class MigrationName14 : Migration
+    public partial class MigrationName103 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -36,7 +36,7 @@ namespace BackendLi.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    TokenValue = table.Column<string>(type: "longtext", nullable: false)
+                    TokenValue = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsValid = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "datetime(6)", nullable: false)
@@ -61,14 +61,163 @@ namespace BackendLi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    Username = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     BackgroundPhoto = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ProfilePhoto = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RefreshToken = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RefreshTokenExpiryTime = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_users", x => x.Id);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "chat",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    SenderId = table.Column<int>(type: "int", nullable: false),
+                    ReceiverId = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_chat", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_chat_users_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_chat_users_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "chat_sender",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    SenderId = table.Column<int>(type: "int", nullable: false),
+                    ReceiverId = table.Column<int>(type: "int", nullable: false),
+                    Message = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_chat_sender", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_chat_sender_users_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_chat_sender_users_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "follow",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    FollowerId = table.Column<int>(type: "int", nullable: false),
+                    FollowingId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_follow", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_follow_users_FollowerId",
+                        column: x => x.FollowerId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_follow_users_FollowingId",
+                        column: x => x.FollowingId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "gallery",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Name = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    IsPrivate = table.Column<bool>(type: "tinyint(1)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_gallery", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_gallery_users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "users",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "notification",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Content = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    SenderId = table.Column<int>(type: "int", nullable: false),
+                    ReceiverId = table.Column<int>(type: "int", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_notification", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_notification_users_ReceiverId",
+                        column: x => x.ReceiverId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_notification_users_SenderId",
+                        column: x => x.SenderId,
+                        principalTable: "users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -85,22 +234,27 @@ namespace BackendLi.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Taked = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     Uploaded = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    LocationId = table.Column<int>(type: "int", nullable: false),
+                    LocationId = table.Column<int>(type: "int", nullable: true),
                     ImageUrl = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Category = table.Column<int>(type: "int", nullable: false),
                     Width = table.Column<int>(type: "int", nullable: false),
-                    Height = table.Column<int>(type: "int", nullable: false)
+                    Height = table.Column<int>(type: "int", nullable: false),
+                    GalleryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_image", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_image_gallery_GalleryId",
+                        column: x => x.GalleryId,
+                        principalTable: "gallery",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_image_location_LocationId",
                         column: x => x.LocationId,
                         principalTable: "location",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_image_users_AutorId",
                         column: x => x.AutorId,
@@ -196,6 +350,26 @@ namespace BackendLi.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateIndex(
+                name: "IX_chat_ReceiverId",
+                table: "chat",
+                column: "ReceiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_chat_SenderId",
+                table: "chat",
+                column: "SenderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_chat_sender_ReceiverId",
+                table: "chat_sender",
+                column: "ReceiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_chat_sender_SenderId",
+                table: "chat_sender",
+                column: "SenderId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_comment_ImageId",
                 table: "comment",
                 column: "ImageId");
@@ -217,9 +391,29 @@ namespace BackendLi.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_follow_FollowerId",
+                table: "follow",
+                column: "FollowerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_follow_FollowingId",
+                table: "follow",
+                column: "FollowingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_gallery_UserId",
+                table: "gallery",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_image_AutorId",
                 table: "image",
                 column: "AutorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_image_GalleryId",
+                table: "image",
+                column: "GalleryId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_image_LocationId",
@@ -235,10 +429,26 @@ namespace BackendLi.Migrations
                 name: "IX_like_UserId",
                 table: "like",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_notification_ReceiverId",
+                table: "notification",
+                column: "ReceiverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_notification_SenderId",
+                table: "notification",
+                column: "SenderId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "chat");
+
+            migrationBuilder.DropTable(
+                name: "chat_sender");
+
             migrationBuilder.DropTable(
                 name: "comment");
 
@@ -246,13 +456,22 @@ namespace BackendLi.Migrations
                 name: "editor");
 
             migrationBuilder.DropTable(
+                name: "follow");
+
+            migrationBuilder.DropTable(
                 name: "like");
+
+            migrationBuilder.DropTable(
+                name: "notification");
 
             migrationBuilder.DropTable(
                 name: "token");
 
             migrationBuilder.DropTable(
                 name: "image");
+
+            migrationBuilder.DropTable(
+                name: "gallery");
 
             migrationBuilder.DropTable(
                 name: "location");

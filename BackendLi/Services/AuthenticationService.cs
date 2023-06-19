@@ -87,11 +87,11 @@ public class AuthenticationService : IAuthenticationService
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-    
+
         var token = new JwtSecurityToken(configuration["Jwt:Issuer"],
             configuration["Jwt:Audience"],
             claims,
-            expires: DateTime.Now.AddSeconds(1),
+            expires: DateTime.Now.AddHours(2),
             signingCredentials: credentials);
         Console.WriteLine(DateTime.Now.Hour  + " "+ DateTime.Now.Minute+" " +DateTime.Now.Second);
         Console.WriteLine(DateTime.Now.Hour  + " "+ DateTime.Now.Minute+" " +DateTime.Now.Second);

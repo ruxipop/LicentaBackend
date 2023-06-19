@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using BackendLi.DataAccess;
+using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Entities.Attributes;
 using Microsoft.EntityFrameworkCore;
@@ -20,7 +21,7 @@ public class UserService: IUserService
     
     public User? GetUser(int userId)
     {
-        return repository.GetEntities<User>().FirstOrDefault(x => x.Id == userId);
+        return repository.GetEntities<User>().Include(x=>x.Location).FirstOrDefault(x => x.Id == userId);
     }
 
     public User? getUserByEmail(string Email)
@@ -79,5 +80,43 @@ public class UserService: IUserService
 
         var emailClaim = decodedToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
         return repository.GetEntities<User>().FirstOrDefault(u => u.Email == emailClaim);
+    }
+    
+    
+    public void UpdateUser(UserDto userDto)
+    {
+
+        var user = repository.GetEntities<User>().FirstOrDefault(x => userDto.Id == x.Id);
+        var location = repository.GetEntities<Location>()
+            .FirstOrDefault(l => l.City == userDto.Location.City && l.Country == userDto.Location.Country);
+
+        if (location == null)
+        {
+            location = userDto.Location;
+            using (IUnitOfWork unitOfWork = repository.CreateUnitOfWork())
+            {
+                unitOfWork.Add(location);
+                unitOfWork.SaveChanges();
+
+            }
+        }
+
+        Console.WriteLine(location.Id);
+        user.LocationId = location.Id;
+        user.ProfilePhoto = userDto.ProfilePhoto;
+        user.BackgroundPhoto = userDto.BackgroundPhoto;
+        user.Name = userDto.Name;
+        user.Username = userDto.Username;
+        user.Description = userDto.Description;
+        
+        using (IUnitOfWork unitOfWork = repository.CreateUnitOfWork())
+        {
+            unitOfWork.Update(user);
+            unitOfWork.SaveChanges();
+                
+        }
+
+
+
     }
 }

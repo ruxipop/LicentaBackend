@@ -275,6 +275,37 @@ namespace BackendLi.Migrations
                     b.ToTable("location");
                 });
 
+            modelBuilder.Entity("BackendLi.Entities.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("ReceiverId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SenderId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceiverId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("notification");
+                });
+
             modelBuilder.Entity("BackendLi.Entities.Token", b =>
                 {
                     b.Property<int>("Id")
@@ -304,9 +335,15 @@ namespace BackendLi.Migrations
                     b.Property<string>("BackgroundPhoto")
                         .HasColumnType("longtext");
 
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int?>("LocationId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -334,6 +371,8 @@ namespace BackendLi.Migrations
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LocationId");
 
                     b.ToTable("users");
                 });
@@ -482,6 +521,34 @@ namespace BackendLi.Migrations
                     b.Navigation("Image");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.Notification", b =>
+                {
+                    b.HasOne("BackendLi.Entities.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BackendLi.Entities.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.User", b =>
+                {
+                    b.HasOne("BackendLi.Entities.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
+
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Gallery", b =>

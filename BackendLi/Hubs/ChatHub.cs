@@ -20,11 +20,9 @@ namespace BackendLi.Hubs
         }
         public override async Task OnConnectedAsync()
         {
-            Console.WriteLine("intra");
             string username = Context.GetHttpContext().Request.Query["username"];
             Users.Add(Context.ConnectionId, username);
-            Console.WriteLine("username " + username);
-            Console.WriteLine(Context.ConnectionId);
+            Console.WriteLine("User connected: "+username);
             await base.OnConnectedAsync();
         }
 
@@ -34,22 +32,18 @@ namespace BackendLi.Hubs
             Console.WriteLine(username);
             if (!string.IsNullOrEmpty(username))
             {
-                Users.Remove(Context.ConnectionId); // Eliminați utilizatorul din dicționar
+                Users.Remove(Context.ConnectionId); 
 
                 Console.WriteLine("User disconnected: " + username);
-                // await AddMessageToChat(string.Empty, $"{username} left!");
             }
 
             await base.OnDisconnectedAsync(exception);
         }
 
-        public async Task SendNotification(string receiverId,string senderId, string message)
+        public async Task SendChat(string receiverId,string senderId, string message)
         {
-            Console.WriteLine("oo "+Convert.ToInt32(receiverId)+" "+Convert.ToInt32(senderId)+" "+message+" "+ MessageStatus.DELIVERED + DateTime.Now);
             if (senderId == null || receiverId == null || message == null)
             {
-                // Tratați cazul în care una dintre variabile este nulă
-                // De exemplu, puteți arunca o excepție, puteți trimite un mesaj de eroare sau puteți ignora acțiunea
                 return;
             }
             var messageDto = new ChatMessage
@@ -60,21 +54,51 @@ namespace BackendLi.Hubs
                 Timestamp = DateTime.Now,
                 Status = MessageStatus.DELIVERED
             };
-            Console.WriteLine("Ceeee");
             using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
             {
             
                 unitOfWork.Add(messageDto);
                 unitOfWork.SaveChanges();
             }
-            Console.WriteLine("Ceeee");
 
             string connectionId = Users.FirstOrDefault(u => u.Value == receiverId).Key;
-            Console.WriteLine(receiverId);
-            Console.WriteLine(connectionId);
-            await Clients.Client(connectionId).SendAsync("ReceiveNotification",messageDto);
-            // await Clients.All.SendAsync("ReceiveNotification",senderId, message);
+            if (connectionId != null)
+            {
+                await Clients.Client(connectionId).SendAsync("ReceiveChat", messageDto);
+            }
+        }
+        
+        
+        public async Task SendNotification(string receiverId,string senderId, string message,NotificationType type)
+        {
+            Console.WriteLine("Not type "+type);
+            if (senderId == null || receiverId == null || message == null)
+            {
+                return;
+            }
+            var notificationDto = new Notification()
+            {
+                SenderId = Convert.ToInt32(senderId),
+                ReceiverId =Convert.ToInt32(receiverId),
+               Content =message,
+                Timestamp = DateTime.Now,
+               Type = type
+            };
+            using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+            {
+            
+                unitOfWork.Add(notificationDto);
+                unitOfWork.SaveChanges();
+            }
+
+            string connectionId = Users.FirstOrDefault(u => u.Value == receiverId).Key;
+            if (connectionId!=null)
+            {
+                await Clients.Client(connectionId).SendAsync("ReceiveNotification", notificationDto);
+            }
 
         }
+        
+        
     }
 }

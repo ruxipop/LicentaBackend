@@ -16,6 +16,7 @@ public class DataContext : DbContext
     public DbSet<ChatMessage> Chat{ get; set; }
     public DbSet<ChatMessageSender> ChatSender{ get; set; }
     public DbSet<Location> Location{ get; set; }
+    public DbSet<Notification> Notifications { set; get; }
 
     public DataContext(IConfiguration configuration) { }
 

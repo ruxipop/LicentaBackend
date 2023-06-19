@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using BackendLi.DataAccess;
 using BackendLi.DTOs;
 using BackendLi.Entities;
@@ -16,14 +17,17 @@ public class UserController:ControllerBase
     private readonly IAuthenticationService _authenticationService;
     private readonly IUserService _userService;
     private readonly IEmailService _emailService;
+    private readonly IWritePhotoService _writePhotoService;
 
 
-    public UserController(IEmailService emailService,IUserService userService,IAuthenticationService authenticationService,IRepository repository)
+
+    public UserController(IEmailService emailService,IUserService userService,IAuthenticationService authenticationService,IRepository repository,IWritePhotoService writePhotoService)
     {
         _repository = repository;
         _authenticationService = authenticationService;
         _userService = userService;
         _emailService = emailService;
+        _writePhotoService = writePhotoService;
     }
     
     [AllowAnonymous]
@@ -42,11 +46,12 @@ Console.WriteLine(dictionary);
     [HttpPost("register")]
     public IActionResult Register([FromBody] User user)
     {
+        Console.WriteLine("d");
        User? existUser = _repository.GetEntities<User>().FirstOrDefault(x => x.Email == user.Email);
-        // if (user==null)
-        // {
-        //     return BadRequest("User already exists");
-        // }
+        if (existUser!=null)
+        {
+            return BadRequest("User already exists");
+        }
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
             using (var sha256 = SHA256.Create())
@@ -199,7 +204,23 @@ Console.WriteLine(dictionary);
             RefreshToken = newRefreshToken
         });
     }
-   
+    [HttpPut("update")]
+    [AllowAnonymous]
+    public IActionResult Update([FromBody] UserDto user)
+    {
+
+        if (user.BackgroundPhoto != "" && !user.BackgroundPhoto.Contains("assets"))
+        {
+            user.BackgroundPhoto = _writePhotoService.createPhoto(user.BackgroundPhoto);
+        }
+        if (user.ProfilePhoto != ""  && !user.ProfilePhoto.Contains("assets"))
+        {
+            user.ProfilePhoto = _writePhotoService.createPhoto(user.ProfilePhoto);
+        } 
+        _userService.UpdateUser(user);
+
+        return Ok();
+    }
 
 
 }

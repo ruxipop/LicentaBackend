@@ -13,7 +13,7 @@ public class Image
     public int AutorId { get; set; } 
 
     [ForeignKey("AutorId")] 
-    public User Autor { get; set; }
+    public virtual User? Autor { get; set; }
 
     public string Description { get; set; }
     public string Title { get; set; }
@@ -32,7 +32,7 @@ public class Image
     public EditorChoice? EditorChoice { get; set; }
 
 
-    public List<Like> Likes { get; set; }
+    public List<Like>? Likes { get; set; }
     
     
     [ForeignKey("Gallery")]
@@ -40,7 +40,7 @@ public class Image
     public virtual Gallery? Gallery { get; set; }
 
 
-    public ICollection<Comment> Comments { get; set; }
+    public ICollection<Comment>? Comments { get; set; }
 
     public Image()
     {

@@ -182,3 +182,6 @@ C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\runtimes\
 C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\System.Net.WebSockets.WebSocketProtocol.dll
 C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\sealc.dll
 C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\SEALNet.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\Firebase.Auth.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\Firebase.Storage.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\BackendLi\bin\Debug\net6.0\System.ServiceModel.dll
