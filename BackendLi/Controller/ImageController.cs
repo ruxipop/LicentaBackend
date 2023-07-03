@@ -1,22 +1,9 @@
-using System.Buffers.Text;
-using System.Net.Mime;
-using System.Text;
-using System.Text.RegularExpressions;
-using BackendLi.DataAccess;
-using BackendLi.DataAccess.Enums;
+using System.Net;
 using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.IO;
-using System.Text;
-using System.Text.RegularExpressions;
-
-using Firebase;
-using Firebase.Auth;
-using Firebase.Storage;
 
 namespace BackendLi.Controller;
 
@@ -26,18 +13,25 @@ public class ImageController : ControllerBase
 {
 
     private readonly IImageService _imageService;
+    private readonly IEditorService _editorService;
     private readonly IFollowService _followService;
     private readonly IWritePhotoService _writePhotoService;
-    public ImageController(IImageService imageService,IFollowService followService,IWritePhotoService writePhotoService)
+    private readonly Searcher _searcher;
+    private readonly ColorDescriptor _colorDescriptor;
+
+    public ImageController(IImageService imageService,IFollowService followService,IWritePhotoService writePhotoService,IEditorService editorService)
     {
         _imageService = imageService;
         _followService = followService;
         _writePhotoService = writePhotoService;
+        _editorService = editorService;
+        _searcher = new Searcher("fisier.csv");
+        _colorDescriptor = new ColorDescriptor((8, 12, 3));
     }
 
     [AllowAnonymous]
     [HttpGet]
-    public IEnumerable<Image> GetImages()
+    public IEnumerable<  Photo > GetImages()
     {
 
         return _imageService.GetImages();
@@ -47,7 +41,7 @@ public class ImageController : ControllerBase
     [HttpGet("getImage/{id}")]
     public IActionResult GetImage(int id)
     {
-        Image? image = _imageService.GetImageById(id);
+        Photo ? image = _imageService.GetImageById(id);
         if (image != null)
         {
             return Ok(image);
@@ -61,8 +55,8 @@ public class ImageController : ControllerBase
     [HttpGet("pages")]
     public IActionResult GetImages([FromQuery] int pageNb, [FromQuery] int pageSize, [FromQuery] string type, [FromQuery] string? category)
     {
-        
 
+        var finalImages= new List<ImageResponse>();
         List<string> categories = new List<string>();
         if (!string.IsNullOrEmpty(category))
         {
@@ -75,13 +69,23 @@ public class ImageController : ControllerBase
                 categories.Add(category);
             }
 
-            var image2 = _imageService.GetPaginatedImages(pageNb, pageSize, type, categories);
-            return Ok(image2);
+            var images = _imageService.GetPaginatedImages(pageNb, pageSize, type, categories);
+         
+            foreach (var image in images)
+            {
+                var check = _editorService.IsImageVoted(image.Id);
+                finalImages.Add(new ImageResponse(image,check));
+            }
+            return Ok(finalImages);
         }
 
-        var image = _imageService.GetPaginatedImages(pageNb, pageSize, type, null);
-        Console.WriteLine("acum " + image);
-        return Ok(image);
+        var images2 = _imageService.GetPaginatedImages(pageNb, pageSize, type, null);
+        foreach (var image in images2)
+        {
+            var check = _editorService.IsImageVoted(image.Id);
+            finalImages.Add(new ImageResponse(image,check));
+        }
+        return Ok(finalImages);
     }
 
 
@@ -101,15 +105,14 @@ public class ImageController : ControllerBase
         return Ok(new { imageType = imageType });
     }
 
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("getImagesByAuthorId")]
-    public IEnumerable<Image> GetImagesByType([FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] int userId)
+    public IEnumerable<  Photo > GetImagesByType([FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] int userId)
     {
-        Console.WriteLine("intruuuuu ");
         return _imageService.GetImagesByAuthorId(pageNb,pageSize,userId);
     }
     
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("getImageLikes")]
     public IActionResult GetImageLikes([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize,[FromQuery] int userId,[FromQuery] string type)
     {
@@ -171,36 +174,47 @@ public class ImageController : ControllerBase
         return Ok(likesModalDtos);
     }
     
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("getImagesUser")]
     public IActionResult GetImagesByUserId([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize)
     {
 
-        var likes = _imageService.GetImagesByUserId(id, pageNb, pageSize);
-        return Ok(likes);
+        var images = _imageService.GetImagesByUserId(id, pageNb, pageSize);
+        var finalImages = new List<ImageResponse>();
+        foreach (var image in images)
+        {
+            var check = _editorService.IsImageVoted(image.Id);
+            finalImages.Add(new ImageResponse(image,check));
+        }
+        return Ok(finalImages);
     }
     
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("getImagesLiked")]
     public IActionResult GetImagesLikedByUserId([FromQuery] int id,[FromQuery] int pageNb,[FromQuery] int pageSize)
     {
-
-        var likes = _imageService.GetLikedImagesByUser(id, pageNb, pageSize);
-        return Ok(likes);
+        var finalImages = new List<ImageResponse>();
+        var images = _imageService.GetLikedImagesByUser(id, pageNb, pageSize);
+        foreach (var image in images)
+        {
+            var check = _editorService.IsImageVoted(image.Id);
+            finalImages.Add(new ImageResponse(image,check));
+        }
+        return Ok(finalImages);
     }
 
 
     [HttpPost("create")]
     [AllowAnonymous]
-    public async Task<IActionResult> Create([FromBody] Image image)
+    public async Task<IActionResult> Create([FromBody]   Photo  image)
     {   
 
-    
-          image.ImageUrl = _writePhotoService.createPhoto(image.ImageUrl);
-        _imageService.CreateImage(image);
-         
 
-      return Ok();
+        if (!_imageService.CreateImage(image)) return BadRequest(new{  error ="An image with the same title already exists!"});
+        _writePhotoService.AddImageToIndex(image.ImageUrl,image.Title);
+
+
+      return Ok(new SuccessResponseDto("The image was uploaded successfully."));
 
     }
     
@@ -208,9 +222,40 @@ public class ImageController : ControllerBase
     [AllowAnonymous]
     public IActionResult DeleteImage(int id)
     {
-        
+        Console.WriteLine("delete image");
         _imageService.DeleteImage(id);
         return Ok(new SuccessResponseDto("Your image has been deleted"));
 
+    }
+
+    [AllowAnonymous]
+    [HttpGet("getSimi")]
+    public IActionResult iep([FromQuery] string queryImagePath,string imageTitle)
+    {
+        var list = new List<Photo>();
+        using (WebClient webClient = new WebClient())
+        {
+            byte[] imageData = webClient.DownloadData(queryImagePath);
+            using (var imageStream = new MemoryStream(imageData))
+            {
+                Image<Rgba32> image = Image.Load<Rgba32>(imageStream);
+
+                float[] queryFeatures = _colorDescriptor.DescribeImage(image);
+                List<(double, string)> results = _searcher.ReadFile(queryFeatures);
+                
+                foreach (var result in results)
+                {
+                    Console.WriteLine($"Image ID: {result.Item2}, Distance: {result.Item1}");
+
+                    if (!result.Item2.Contains(imageTitle))
+                    {
+                       
+Console.WriteLine("ajunf");                        list.Add(_imageService.GetImageByTitle(result.Item2)!);
+                    }
+                }
+            }
+        }
+        Console.WriteLine(list[0]);
+        return Ok(list);
     }
 }

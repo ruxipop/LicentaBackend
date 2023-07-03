@@ -19,14 +19,14 @@ public class ImageService:IImageService
     }
 
     
-    public IEnumerable<Image> GetImages()
+    public IEnumerable<Photo> GetImages()
     {
-        return _repository.GetEntities<Image>()
+        return _repository.GetEntities<Photo>()
             .Include(i => i.Autor)
             .Include(i => i.Location)
             .ToList();    }
 
-    public IEnumerable<Image> GetPaginatedImages(int pageNb, int pageSize,string type,List<string> category)
+    public IEnumerable<Photo> GetPaginatedImages(int pageNb, int pageSize,string type,List<string> category)
     {
       
         return GetImagesByTypeAndCategory(type,category).Skip((pageNb - 1) * pageSize).Take(pageSize)
@@ -41,12 +41,12 @@ public class ImageService:IImageService
             .ToList();
         
     }
-    public Image? GetImageById(int id)
+    public Photo? GetImageById(int id)
     {
-        return _repository.GetEntities<Image>()
-            .Include(i => i.Autor)
-            .Include(i => i.Location)
-            .Include(i => i.Comments)
+        return _repository.GetEntities<Photo>()
+            .Include(i => i.Autor!)
+            .Include(i => i.Location!)
+            .Include(i => i.Comments!)
             .ThenInclude(c => c.User)
             .Include(i => i.EditorChoice)
             .ThenInclude(ec => ec.Editor)   
@@ -56,11 +56,11 @@ public class ImageService:IImageService
 
     }
 
-    private IEnumerable<Image> getPopularImages(List<string>? category)
+    private IEnumerable<Photo> getPopularImages(List<string>? category)
     {
         List<ImageCategory> enumCategories = category?.Select(c => (ImageCategory)Enum.Parse(typeof(ImageCategory), c)).ToList();
 
-        return _repository.GetEntities<Image>()
+        return _repository.GetEntities<Photo>()
             .Include(i => i.EditorChoice)
             .Where(i => i.EditorChoice == null && (category == null || enumCategories.Contains(i.Category)))
             .Include(i => i.Likes).Include(i=>i.Autor)
@@ -93,15 +93,15 @@ public class ImageService:IImageService
 
     }
 
-    private IEnumerable<Image> GetEditorChoiceImages(List<String>? category)
+    private IEnumerable<Photo> GetEditorChoiceImages(List<String>? category)
     {        List<ImageCategory> enumCategories = category?.Select(c => (ImageCategory)Enum.Parse(typeof(ImageCategory), c)).ToList();
 
 
-        return _repository.GetEntities<Image>().Include(i => i.EditorChoice).Include(i=>i.Autor).Include(i=>i.Likes)
+        return _repository.GetEntities<Photo>().Include(i => i.EditorChoice).Include(i=>i.Autor).Include(i=>i.Likes)
             .Where(i => i.EditorChoice !=null  && (enumCategories == null || enumCategories.Contains(i.Category))).ToList();
     }
 
-    private IEnumerable<Image> GetFreshImages(List<string>? category)
+    private IEnumerable<Photo> GetFreshImages(List<string>? category)
     {
 
 
@@ -109,13 +109,13 @@ public class ImageService:IImageService
 
              DateTime twoDaysAgo = DateTime.Now.AddDays(-2);
 
-             return _repository.GetEntities<Image>().Include(i=>i.Autor).Include(i=>i.Likes)
+             return _repository.GetEntities<Photo>().Include(i=>i.Autor).Include(i=>i.Likes)
                  .Where(i => i.EditorChoice == null && i.Likes.Count < 50 && (enumCategories == null || enumCategories.Contains(i.Category)) && i.Uploaded > twoDaysAgo)
                  .OrderByDescending(i => i.Uploaded)
                  .ToList();
     }
 
-    public IEnumerable<Image> GetImagesByTypeAndCategory(string type,List<string>?category)
+    public IEnumerable<Photo> GetImagesByTypeAndCategory(string type,List<string>?category)
     { 
         DeleteExpiredEditorChoices();
         
@@ -128,12 +128,11 @@ public class ImageService:IImageService
             case "EditorChoice":
                 return GetEditorChoiceImages(category);
             
-            case "Basic":
-                Console.WriteLine("basic");
-                 List<ImageCategory> enumCategories = category?.Select(c => (ImageCategory)Enum.Parse(typeof(ImageCategory), c)).ToList();
+            case "Basic": 
+                List<ImageCategory> enumCategories = category?.Select(c => (ImageCategory)Enum.Parse(typeof(ImageCategory), c)).ToList();
 
                 var freshimages = GetFreshImages(null);
-                return _repository.GetEntities<Image>().Where
+                return _repository.GetEntities<Photo>().Where
                     
                     (i=>i.Likes.Count <50 && !freshimages.Contains(i) && i.EditorChoice==null && (enumCategories == null || enumCategories.Contains(i.Category))).Include(i=>i.Autor).Include(i=>i.Likes).ToList();
             default:
@@ -169,10 +168,10 @@ public class ImageService:IImageService
         return popularImages.Any(image => image.Id == imageId);
     }
     
-   public IEnumerable<Image> GetImagesByAuthorId(int pageNb,int pageSize,int authorId)
+   public IEnumerable<Photo> GetImagesByAuthorId(int pageNb,int pageSize,int authorId)
 
     {
-        return _repository.GetEntities<Image>()
+        return _repository.GetEntities<Photo>()
             .Where(i => i.Autor.Id == authorId)
             .Skip((pageNb - 1) * pageSize).Take(pageSize)
            
@@ -180,16 +179,16 @@ public class ImageService:IImageService
     }
 
 
-    public IEnumerable<Image> GetImagesByUserId(int userId,int pageNb, int pageSize)
+    public IEnumerable<Photo> GetImagesByUserId(int userId,int pageNb, int pageSize)
     {
-        return _repository.GetEntities<Image>().Include(i=>i.Autor).Include(i=>i.Likes).Where(l=>l.AutorId==userId).Skip((pageNb - 1) * pageSize).Take(pageSize)
+        return _repository.GetEntities<Photo>().Include(i=>i.Autor).Include(i=>i.Likes).Where(l=>l.AutorId==userId).Skip((pageNb - 1) * pageSize).Take(pageSize)
            
             .ToList();
     }
 
-    public IEnumerable<Image> GetLikedImagesByUser(int userId,int pageNb, int pageSize)
+    public IEnumerable<Photo> GetLikedImagesByUser(int userId,int pageNb, int pageSize)
     {
-        return _repository.GetEntities<Image>()
+        return _repository.GetEntities<Photo>()
             .Include(i=>i.Autor).Include(i=>i.Likes)
             .Where(image => image.Likes.Any(like => like.UserId == userId))
             .Skip((pageNb - 1) * pageSize)
@@ -199,22 +198,25 @@ public class ImageService:IImageService
     
     
     
-    public void CreateImage(Image image)
+    public bool CreateImage(Photo image)
     {
-      
-        Console.WriteLine("ajung");
+        var existingImage = _repository.GetEntities<Photo>().FirstOrDefault(i =>  image.Title == i.Title);
+
+        if (existingImage != null) return false;
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
+          
             unitOfWork.Add(image);
             unitOfWork.SaveChanges();
                 
         }
-        
+
+        return true;
     }
 
     public void DeleteImage(int id)
     {
-        var image = _repository.GetEntities<Image>().FirstOrDefault(i => i.Id == id);
+        var image = _repository.GetEntities<Photo>().FirstOrDefault(i => i.Id == id);
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
             unitOfWork.Delete(image!);
@@ -223,4 +225,12 @@ public class ImageService:IImageService
         }
 
     }
+
+    public Photo? GetImageByTitle(string title)
+    {
+        
+        return _repository.GetEntities<Photo>().Include(i=>i.Autor).FirstOrDefault(i => i.Title==title);
+    }
+
+
 }

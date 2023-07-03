@@ -22,7 +22,8 @@ public class GalleryService :IGalleryService
     {
         return _repository.GetEntities<Gallery>()
             .Include(x => x.Images!)
-            .ThenInclude(i => i.Autor).Include(u=>u.User!)
+            .ThenInclude(i => i.Autor ).Include(u=>u.User)
+            .Include(x=>x.Images!).ThenInclude(i=>i.Likes)
             .FirstOrDefault(x => x.Id == id);
 
     }
@@ -72,7 +73,7 @@ public class GalleryService :IGalleryService
             
     }
 
-    public SuccessResponseDto AddGalleryToImage(Image image, Gallery gallery)
+    public SuccessResponseDto AddGalleryToImage(Photo image, Gallery gallery)
     {
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
@@ -84,7 +85,7 @@ public class GalleryService :IGalleryService
 
     }
 
-    public SuccessResponseDto RemoveImageFromGallery(Image image, Gallery gallery)
+    public SuccessResponseDto RemoveImageFromGallery(Photo image, Gallery gallery)
     {
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
@@ -102,7 +103,7 @@ public class GalleryService :IGalleryService
             var gallery = _repository.GetEntities<Gallery>().FirstOrDefault(g => g.Id == id);
             if (gallery != null)
             {
-                var images = _repository.GetEntities<Image>().Where(i => i.GalleryId == id);
+                var images = _repository.GetEntities<Photo>().Where(i => i.GalleryId == id);
                 foreach (var image in images)
                 {
                     image.GalleryId = null;

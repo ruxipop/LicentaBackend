@@ -23,4 +23,6 @@ public class NewDbContextFactory : INewDbContextFactory<DbContext>
         return new DataContext(connectionStrings.Database);
     }
     
+
+    
 }

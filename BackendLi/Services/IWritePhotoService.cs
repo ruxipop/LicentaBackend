@@ -2,5 +2,5 @@ namespace BackendLi.Services;
 
 public interface IWritePhotoService
 {
-    public string createPhoto(string imageUrl);
+    public void AddImageToIndex(string imagePath, string imageName);
 }

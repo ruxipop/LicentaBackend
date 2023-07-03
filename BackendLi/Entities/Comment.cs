@@ -16,7 +16,7 @@ public class Comment
     public virtual User? User { get; set; }
     [ForeignKey("ImageId")] 
    public int ImageId { get; set; }
-    public virtual Image? Image{ get; set; }
+    public virtual Photo? Image{ get; set; }
 
     public string CommentText { get; set; }
     public DateTime CreatedAt { get; set; }

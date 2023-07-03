@@ -64,13 +64,9 @@ Console.WriteLine("c");
     [HttpDelete("delete/{notificationId}")]
     public IActionResult DeleteNotification(int notificationId)
     {
-        Console.WriteLine("c");
-
         SuccessResponseDto successResponseDto = _notificationService.DeleteNotification(notificationId);
   
         return Ok(successResponseDto);
         
-
-
     }
 }

@@ -34,12 +34,15 @@ public class UserController:ControllerBase
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDetails loginDetails)
     {
-       var dictionary =  _authenticationService.Login(loginDetails);
-Console.WriteLine(dictionary);
-     
-        return Ok(dictionary);
-        
-     
+        Console.WriteLine("ce");
+        var result = _authenticationService.Login(loginDetails);
+
+        if(result == null)
+        {
+            return BadRequest(new { error = "User not found!" });
+        }
+
+        return Ok(result);
     }
 
     [AllowAnonymous]
@@ -50,7 +53,13 @@ Console.WriteLine(dictionary);
        User? existUser = _repository.GetEntities<User>().FirstOrDefault(x => x.Email == user.Email);
         if (existUser!=null)
         {
-            return BadRequest("User already exists");
+            return BadRequest("The email address already exists. Please choose another one.");
+        }
+        
+        User? existUser1 = _repository.GetEntities<User>().FirstOrDefault(x => x.Username == user.Username);
+        if (existUser1!=null)
+        {
+            return BadRequest("The username already exists. Please choose another one.");
         }
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
@@ -208,15 +217,6 @@ Console.WriteLine(dictionary);
     [AllowAnonymous]
     public IActionResult Update([FromBody] UserDto user)
     {
-
-        if (user.BackgroundPhoto != "" && !user.BackgroundPhoto.Contains("assets"))
-        {
-            user.BackgroundPhoto = _writePhotoService.createPhoto(user.BackgroundPhoto);
-        }
-        if (user.ProfilePhoto != ""  && !user.ProfilePhoto.Contains("assets"))
-        {
-            user.ProfilePhoto = _writePhotoService.createPhoto(user.ProfilePhoto);
-        } 
         _userService.UpdateUser(user);
 
         return Ok();

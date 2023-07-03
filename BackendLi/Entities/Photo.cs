@@ -6,7 +6,7 @@ namespace BackendLi.Entities;
 
 
 [Table("image")]
-public class Image
+public class Photo
 {
     
     public int Id { get; set; }
@@ -15,7 +15,7 @@ public class Image
     [ForeignKey("AutorId")] 
     public virtual User? Autor { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public string Title { get; set; }
 
     public DateTime Taked{ get; set; }
@@ -42,7 +42,7 @@ public class Image
 
     public ICollection<Comment>? Comments { get; set; }
 
-    public Image()
+    public Photo()
     {
         Comments= new HashSet<Comment>();
         Likes = new List<Like>();

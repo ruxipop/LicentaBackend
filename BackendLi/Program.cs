@@ -98,12 +98,7 @@ app.UseAuthorization();
 app.MapControllers();
 app.MapHub<ChatHub>("/chatsocket");
 
-// app.UseEndpoints(endpoints =>
-// {
-//     // endpoints.MapControllers();
-//     
-//     endpoints.MapHub<ChatHub>("/chatsocket");     // path will look like this https://localhost:44379/chatsocket 
-// });
+
 using (var context = new DataContext(app.Configuration.GetConnectionString("Database")))
 {
     if (context.Database.GetPendingMigrations().Any())

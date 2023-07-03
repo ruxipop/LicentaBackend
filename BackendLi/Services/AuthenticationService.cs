@@ -43,7 +43,6 @@ public class AuthenticationService : IAuthenticationService
             };
             string accessToken = GenerateAccessToken(claims);
             string refreshToken = GenerateRefreshToken();
-            Console.WriteLine("refere"+refreshToken);
             using (IUnitOfWork unitOfWork = repository.CreateUnitOfWork())
             {
                 user.RefreshToken = refreshToken;
@@ -60,7 +59,7 @@ public class AuthenticationService : IAuthenticationService
             };
         }
 
-        throw new Exception("User not found!");
+        return null;
     }
 
     public void Logout(string tokenValue)

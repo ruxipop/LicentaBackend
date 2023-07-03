@@ -22,7 +22,7 @@ public class LikeService:ILikeService
 
     public SuccessResponseDto AddLikeToImage(int imageId, User user)
     {
-        Image image =_repository.GetEntities<Image>().FirstOrDefault(i=>i.Id==imageId)?? throw new  ResourceNotFoundException($"Image with id {imageId} not found");
+        Photo image =_repository.GetEntities<  Photo >().FirstOrDefault(i=>i.Id==imageId)?? throw new  ResourceNotFoundException($"Image with id {imageId} not found");
         Like? like = _repository.GetEntities<Like>().FirstOrDefault(i => i.ImageId == imageId && i.UserId == user.Id);
         if (like != null)
         {

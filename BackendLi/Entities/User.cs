@@ -16,13 +16,13 @@ public class User
     public string Username { get; set; }
     
     public string? Description { get; set; }
-    public List<Image>? Images{ get; set; } 
+    public List<Photo>? Images{ get; set; } 
     
     [ForeignKey("LocationId")] 
     public int? LocationId { get; set; }
 
     
-    public Location? Location { get; set; }
+    public virtual Location? Location { get; set; }
     
     
     public string? BackgroundPhoto { get; set; }
@@ -32,10 +32,12 @@ public class User
     public DateTime RefreshTokenExpiryTime { get; set; }
     
     public List<Gallery>? Galleries{ get; set; } 
+    
+    public DateTime RegisterDate { get;set;  }
 
     public User()
     {
-        Images = new List<Image>();
+        Images = new List<Photo>();
         Galleries = new List<Gallery>();
     }
 

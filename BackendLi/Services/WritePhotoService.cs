@@ -1,3 +1,4 @@
+using System.Net;
 using System.Text.RegularExpressions;
 using BackendLi.Entities.Attributes;
 
@@ -7,26 +8,27 @@ namespace BackendLi.Services;
 
 public class WritePhotoService:IWritePhotoService
 {
-
-
-    public  string createPhoto( string imageUrl)
+  
+    public void AddImageToIndex(string imagePath,string imageName)
     {
-        
-        byte[] decBytes = Convert.FromBase64String(Regex.Split(imageUrl, ",")[1]);
-
-   
-        string filename = $"{Guid.NewGuid()}.jpg";
-
-        var assetsFolder = Path.GetFullPath("C:\\Users\\POU2CLJ\\Desktop\\lic\\LicentaFrontend\\src\\assets\\imgs");
-        var imagePath = Path.Combine(assetsFolder,filename);
-        using (FileStream fs = new FileStream(imagePath, FileMode.Create))
+        using (WebClient webClient = new WebClient())
         {
-            fs.Write(decBytes, 0, decBytes.Length);
+            byte[] imageData = webClient.DownloadData(imagePath);
+            using (var imageStream = new MemoryStream(imageData))
+            {
+                Image<Rgba32> image = Image.Load<Rgba32>(imageStream);
 
+                using (var output = new StreamWriter("fisier.csv", append: true))
+                {
+
+                    ColorDescriptor cd = new ColorDescriptor((8, 12, 3));
+                    float[] features = cd.DescribeImage(image);
+                    string featureString = string.Join(",", features);
+                    output.WriteLine($"{imageName},{featureString}");
+                }
+            }
         }
-        
-        var relativePath = "assets/imgs/" + filename;
-        return
-        relativePath;
     }
+
+
 }

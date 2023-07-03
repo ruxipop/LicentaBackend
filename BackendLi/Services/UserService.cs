@@ -87,22 +87,27 @@ public class UserService: IUserService
     {
 
         var user = repository.GetEntities<User>().FirstOrDefault(x => userDto.Id == x.Id);
-        var location = repository.GetEntities<Location>()
-            .FirstOrDefault(l => l.City == userDto.Location.City && l.Country == userDto.Location.Country);
-
-        if (location == null)
+        if (userDto.Location != null)
         {
-            location = userDto.Location;
-            using (IUnitOfWork unitOfWork = repository.CreateUnitOfWork())
+            var location = repository.GetEntities<Location>()
+                .FirstOrDefault(l => l.City == userDto.Location.City && l.Country == userDto.Location.Country);
+
+            if (location == null)
             {
-                unitOfWork.Add(location);
-                unitOfWork.SaveChanges();
+                location = userDto.Location;
+                using (IUnitOfWork unitOfWork = repository.CreateUnitOfWork())
+                {
+                    unitOfWork.Add(location);
+                    unitOfWork.SaveChanges();
 
+                }
             }
+            user.LocationId = location.Id;
         }
-
-        Console.WriteLine(location.Id);
-        user.LocationId = location.Id;
+        else
+        {
+            user.LocationId = null;
+        }
         user.ProfilePhoto = userDto.ProfilePhoto;
         user.BackgroundPhoto = userDto.BackgroundPhoto;
         user.Name = userDto.Name;

@@ -10,7 +10,7 @@ public interface IGalleryService
     public IEnumerable<Gallery> GetAllGalleries(int userId, int pageNb, int pageSize, string? searchTerm);
     public void UpdateGallery(Gallery gallery);
     public void CreateGallery(Gallery gallery);
-    public SuccessResponseDto AddGalleryToImage(Image image, Gallery gallery);
-    public SuccessResponseDto RemoveImageFromGallery(Image image, Gallery gallery);
+    public SuccessResponseDto AddGalleryToImage(Photo image, Gallery gallery);
+    public SuccessResponseDto RemoveImageFromGallery(Photo image, Gallery gallery);
     public void DeleteGallery(int id);
 }
