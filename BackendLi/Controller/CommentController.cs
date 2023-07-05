@@ -1,3 +1,4 @@
+using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -21,16 +22,16 @@ public class CommentController:ControllerBase
 
     
     [HttpPost("addComment")]
-    [Authorize]
+    [AllowAnonymous]
     public void AddComment([FromBody] Comment comment)
     {
         Console.WriteLine("cc"+comment.CreatedAt);
-        Console.WriteLine("intra in add comment");
+        Console.WriteLine("intra in add comment" +comment);
         _commentService.AddComment(comment);
         // return Ok();
     }
     
-    [Authorize]
+    [AllowAnonymous]
     [HttpGet("{imageId}")]
     public IEnumerable<Comment> GetComments(int imageId)
     {

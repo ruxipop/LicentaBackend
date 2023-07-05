@@ -1,9 +1,11 @@
+using BackendLi.DTOs;
 using BackendLi.Entities;
 
 namespace BackendLi.Services;
 
 public interface ICommentService
 {
-    void AddComment(Comment comment);
+
+    public void AddComment(Comment comment);
     IEnumerable<Comment> GetComments(int imageId);
 }

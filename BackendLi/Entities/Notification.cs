@@ -12,8 +12,10 @@ public class Notification
     
     public NotificationType Type { get; set; }
     
-    public string Content { get; set; }
-  
+
+    [ForeignKey("Image")]
+    public int? ImageId { get; set; }
+    public virtual Photo? Image { get; set; }
     
     [ForeignKey("Sender")]
     public int SenderId { get; set; }

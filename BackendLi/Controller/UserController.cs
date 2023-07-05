@@ -17,24 +17,21 @@ public class UserController:ControllerBase
     private readonly IAuthenticationService _authenticationService;
     private readonly IUserService _userService;
     private readonly IEmailService _emailService;
-    private readonly IWritePhotoService _writePhotoService;
 
 
 
-    public UserController(IEmailService emailService,IUserService userService,IAuthenticationService authenticationService,IRepository repository,IWritePhotoService writePhotoService)
+    public UserController(IEmailService emailService,IUserService userService,IAuthenticationService authenticationService,IRepository repository)
     {
         _repository = repository;
         _authenticationService = authenticationService;
         _userService = userService;
         _emailService = emailService;
-        _writePhotoService = writePhotoService;
     }
     
     [AllowAnonymous]
     [HttpPost("login")]
     public IActionResult Login([FromBody] LoginDetails loginDetails)
     {
-        Console.WriteLine("ce");
         var result = _authenticationService.Login(loginDetails);
 
         if(result == null)
@@ -49,7 +46,7 @@ public class UserController:ControllerBase
     [HttpPost("register")]
     public IActionResult Register([FromBody] User user)
     {
-        Console.WriteLine("d");
+        
        User? existUser = _repository.GetEntities<User>().FirstOrDefault(x => x.Email == user.Email);
         if (existUser!=null)
         {
@@ -65,8 +62,7 @@ public class UserController:ControllerBase
         {
             using (var sha256 = SHA256.Create())
             {
-                
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(user.Password));
+               var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(user.Password));
                 user.Password = BitConverter.ToString(hashedBytes).Replace("-", "").ToLower(); 
             }
             unitOfWork.Add(user);
@@ -81,17 +77,15 @@ public class UserController:ControllerBase
     [HttpPost("forgot-password")]
     public IActionResult ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
     {
-        Console.WriteLine("cee");
         if (!ModelState.IsValid)
             return BadRequest();
         User? user = _userService.getUserByEmail(forgotPasswordDto.Email);
-        Console.WriteLine("ok");
         if (user != null)
         {
-            string token = _emailService.GenerateEmailToken(forgotPasswordDto.Email);
+            var token = _emailService.GenerateEmailToken(forgotPasswordDto.Email);
             _emailService.AddEmailToken(token,true,_emailService.getEmailTokenExpiration(token));
-            string resetPasswordURL = "User/reset-password";
-            string resetPasswordLink = "http://localhost:5244/api/" + resetPasswordURL + "?token=" + token;
+            var resetPasswordURL = "User/reset-password";
+            var resetPasswordLink = "http://localhost:5244/api/" + resetPasswordURL + "?token=" + token;
             _emailService.SendEmail(forgotPasswordDto.Email,resetPasswordLink,"f");
 
         }
@@ -148,11 +142,9 @@ public class UserController:ControllerBase
     [HttpGet("me")]
     public IActionResult GetUserFromToken( )
     {
-        Console.WriteLine("intra in au");
         User? currentUser = _userService.GetCurrentUser(Request);
         if (currentUser != null)
         {
-            Console.WriteLine("id"+currentUser.Id);
             return Ok(currentUser);
         }
         return BadRequest(new { error = "User not found" });
@@ -161,15 +153,11 @@ public class UserController:ControllerBase
     [HttpPost("refresh-token")]
     public IActionResult RefreshToken(TokenApiDto tokenApiModel)
     {
-        Console.WriteLine(tokenApiModel.AccessToken);
-        Console.WriteLine(tokenApiModel.RefreshToken);
-         Console.WriteLine("ce masa");
         string accessToken = tokenApiModel.AccessToken;
         string refreshToken = tokenApiModel.RefreshToken;
         var principal = _authenticationService.GetPrincipalFromExpiredToken(accessToken);
         var email = principal.Identity.Name;
         var user = _userService.getUserByEmail(email);
-        Console.WriteLine("o trecut");
         if (user==null)
         {
             Console.WriteLine(1);
@@ -182,7 +170,7 @@ public class UserController:ControllerBase
             Console.WriteLine(user.RefreshToken);
             Console.WriteLine(refreshToken);
 
-            return BadRequest("refrskToken");
+            return BadRequest("Can't regenerate refresh-token");
 
         }
 
@@ -198,7 +186,6 @@ public class UserController:ControllerBase
             return BadRequest("Invalid client request");
         var newAccessToken = _authenticationService.GenerateAccessToken(principal.Claims);
         var newRefreshToken = _authenticationService.GenerateRefreshToken();
-        Console.WriteLine("aici crapa????");
         user.RefreshToken = newRefreshToken;
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {

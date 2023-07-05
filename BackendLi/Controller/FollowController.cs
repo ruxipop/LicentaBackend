@@ -58,7 +58,6 @@ public class FollowController:ControllerBase
     public IActionResult DeleteLike([FromQuery] int followingId)
     {
       
-        Console.WriteLine("follow remove");
 
         
         User? user = _userService.GetCurrentUser(Request);
@@ -73,6 +72,7 @@ public class FollowController:ControllerBase
         return BadRequest();
 
     }
+
 
     [Authorize]
     [HttpPost]

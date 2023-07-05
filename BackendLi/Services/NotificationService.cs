@@ -21,7 +21,7 @@ public class NotificationService:INotificationService
 
     public IEnumerable<Notification> GetAllNotificationByUserId(int userId,int pageNb,int pageSize)
     {
-        return  _repository.GetEntities<Notification>().Where(l=>l.ReceiverId==userId).Include(i=>i.Sender ).Skip((pageNb - 1) * pageSize).Take(pageSize)
+        return  _repository.GetEntities<Notification>().Where(l=>l.ReceiverId==userId).Include(i=>i.Sender )  .OrderByDescending(n => n.Timestamp).Skip((pageNb - 1) * pageSize).Take(pageSize)
            
             .ToList();
         
@@ -62,6 +62,17 @@ public class NotificationService:INotificationService
 
         }
         return new SuccessResponseDto("No notification");
+
+    }
+
+    public void createNotification(Notification notification)
+    {
+        using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
+        {
+            
+            unitOfWork.Add(notification);
+            unitOfWork.SaveChanges();
+        }
 
     }
 

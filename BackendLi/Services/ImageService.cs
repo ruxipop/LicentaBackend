@@ -3,6 +3,8 @@ using BackendLi.DataAccess;
 using BackendLi.DataAccess.Enums;
 using BackendLi.Entities;
 using BackendLi.Entities.Attributes;
+using BackendLi.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Extensions;
 
@@ -13,9 +15,15 @@ public class ImageService:IImageService
 
     private readonly IRepository _repository;
 
+
+
     public ImageService(IRepository repository)
     {
+    
+    
+    
        _repository = repository;
+   
     }
 
     
@@ -195,20 +203,20 @@ public class ImageService:IImageService
             .Take(pageSize)
             .ToList();
     }
+
+  
     
-    
-    
-    public bool CreateImage(Photo image)
+  
+    public  bool CreateImage(Photo image)
     {
         var existingImage = _repository.GetEntities<Photo>().FirstOrDefault(i =>  image.Title == i.Title);
-
         if (existingImage != null) return false;
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
           
             unitOfWork.Add(image);
             unitOfWork.SaveChanges();
-                
+
         }
 
         return true;
@@ -219,8 +227,15 @@ public class ImageService:IImageService
         var image = _repository.GetEntities<Photo>().FirstOrDefault(i => i.Id == id);
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
+            var not = _repository.GetEntities<Notification>().Where(n => n.ImageId == image.Id).ToList();
             unitOfWork.Delete(image!);
+            if (not.Count() != 0)
+            {
+                unitOfWork.DeleteRange(not);
+            }
+            
             unitOfWork.SaveChanges();
+            
                 
         }
 

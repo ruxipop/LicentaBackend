@@ -213,7 +213,6 @@ public class ImageController : ControllerBase
         if (!_imageService.CreateImage(image)) return BadRequest(new{  error ="An image with the same title already exists!"});
         _writePhotoService.AddImageToIndex(image.ImageUrl,image.Title);
 
-
       return Ok(new SuccessResponseDto("The image was uploaded successfully."));
 
     }
@@ -250,7 +249,7 @@ public class ImageController : ControllerBase
                     if (!result.Item2.Contains(imageTitle))
                     {
                        
-Console.WriteLine("ajunf");                        list.Add(_imageService.GetImageByTitle(result.Item2)!);
+                      list.Add(_imageService.GetImageByTitle(result.Item2)!);
                     }
                 }
             }

@@ -6,6 +6,8 @@ using BackendLi.DataAccess;
 using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Entities.Attributes;
+using BackendLi.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendLi.Services;
@@ -13,6 +15,7 @@ namespace BackendLi.Services;
 public class UserService: IUserService
 {
     private readonly IRepository repository;
+ 
 
     public UserService(IRepository repository)
     {

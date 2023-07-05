@@ -47,7 +47,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("chat");
+                    b.ToTable("chat", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.ChatMessageSender", b =>
@@ -78,7 +78,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("chat_sender");
+                    b.ToTable("chat_sender", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Comment", b =>
@@ -106,7 +106,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("comment");
+                    b.ToTable("comment", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.EditorChoice", b =>
@@ -131,7 +131,7 @@ namespace BackendLi.Migrations
                     b.HasIndex("ImageId")
                         .IsUnique();
 
-                    b.ToTable("editor");
+                    b.ToTable("editor", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Follow", b =>
@@ -152,7 +152,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("FollowingId");
 
-                    b.ToTable("follow");
+                    b.ToTable("follow", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Gallery", b =>
@@ -179,7 +179,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("gallery");
+                    b.ToTable("gallery", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Like", b =>
@@ -200,7 +200,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("like");
+                    b.ToTable("like", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Location", b =>
@@ -217,7 +217,7 @@ namespace BackendLi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("location");
+                    b.ToTable("location", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Notification", b =>
@@ -248,7 +248,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("notification");
+                    b.ToTable("notification", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Photo", b =>
@@ -300,7 +300,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("image");
+                    b.ToTable("image", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Token", b =>
@@ -320,7 +320,7 @@ namespace BackendLi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("token");
+                    b.ToTable("token", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.User", b =>
@@ -374,7 +374,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("BackendLi.Entities.ChatMessage", b =>

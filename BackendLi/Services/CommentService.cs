@@ -1,4 +1,5 @@
 using BackendLi.DataAccess;
+using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Entities.Attributes;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,7 @@ public class CommentService:ICommentService
 
     public void AddComment(Comment comment)
     {
+        comment.CreatedAt = DateTime.Now;
         using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
         {
             unitOfWork.Add(comment);
@@ -28,7 +30,7 @@ public class CommentService:ICommentService
     public IEnumerable<Comment> GetComments(int imageId)
     {
         return _repository.GetEntities<Comment>().Include(i=>i.User)
-            .Where(i => i.ImageId== imageId)
+            .Where(i => i.ImageId== imageId).OrderByDescending(c=>c.CreatedAt)
             .ToList();
     }
 }

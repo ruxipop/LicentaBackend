@@ -1,4 +1,6 @@
+using System.Runtime.CompilerServices;
 using BackendLi.DataAccess;
+using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Entities.Attributes;
 using Microsoft.EntityFrameworkCore;
@@ -29,7 +31,7 @@ public class ChatService:IChatService
             .Where(x => x.SenderId == senderId && x.ReceiverId == receiverId).ToList();
     }
 
-    public List<User>? GetUsers(int id)
+    public List<UserChatDto>? GetUsers(int id)
     {
         List<User?> userList = _repository.GetEntities<ChatMessage>()
             .Where(x => x.SenderId == id || x.ReceiverId == id)
@@ -41,12 +43,17 @@ public class ChatService:IChatService
             .Distinct(new UserEqualityComparer())
             .AsEnumerable()
             .ToList();
+ 
 
+        var chatDTOs = new List<UserChatDto>();
+        foreach (var user in distinctUsers)
+        {
+       
+            chatDTOs.Add(new UserChatDto(user, _repository.GetEntities<ChatMessage>()
+                .Where(x => x.SenderId == user.Id || x.ReceiverId==user.Id)
+                .Max(x => x.Timestamp)));        }
 
-    Console.WriteLine(distinctUsers.Count);
-   
-
-        return distinctUsers;
+        return chatDTOs.OrderByDescending(c=>c.LastMessage).ToList();
     }
 
 

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BackendLi.DataAccess;
 using BackendLi.Entities;
+using BackendLi.Services;
 using Microsoft.AspNetCore.SignalR;
 
 namespace BackendLi.Hubs
@@ -11,12 +12,14 @@ namespace BackendLi.Hubs
     public class ChatHub : Hub
     {
         private readonly IRepository _repository;
+        private readonly INotificationService _notification;
 
         private static Dictionary<string, string> Users = new Dictionary<string, string>();
 
-        public ChatHub(IRepository repository)
+        public ChatHub(IRepository repository,INotificationService notificationService)
         {
             _repository = repository;
+            _notification = notificationService;
         }
         public override async Task OnConnectedAsync()
         {
@@ -67,38 +70,29 @@ namespace BackendLi.Hubs
                 await Clients.Client(connectionId).SendAsync("ReceiveChat", messageDto);
             }
         }
-        
-        
-        public async Task SendNotification(string receiverId,string senderId, string message,NotificationType type)
+
+
+        public async Task SendNotification(string receiverId, string senderId, string imageId, NotificationType type)
         {
-            Console.WriteLine("Not type "+type);
-            if (senderId == null || receiverId == null || message == null)
+            if (senderId!=receiverId)
             {
-                return;
-            }
-            var notificationDto = new Notification()
-            {
-                SenderId = Convert.ToInt32(senderId),
-                ReceiverId =Convert.ToInt32(receiverId),
-               Content =message,
-                Timestamp = DateTime.Now,
-               Type = type
-            };
-            using (IUnitOfWork unitOfWork = _repository.CreateUnitOfWork())
-            {
-            
-                unitOfWork.Add(notificationDto);
-                unitOfWork.SaveChanges();
-            }
+                var notificationDto = new Notification()
+                {
+                    SenderId = Convert.ToInt32(senderId),
+                    ReceiverId = Convert.ToInt32(receiverId),
+                    ImageId = Convert.ToInt32(imageId),
+                    Timestamp = DateTime.Now,
+                    Type = type
+                };
+                _notification.createNotification(notificationDto);
+                string connectionId = Users.FirstOrDefault(u => u.Value == receiverId).Key;
+                if (connectionId != null)
+                {
+                    await Clients.Client(connectionId).SendAsync("ReceiveNotification", notificationDto);
+                }
 
-            string connectionId = Users.FirstOrDefault(u => u.Value == receiverId).Key;
-            if (connectionId!=null)
-            {
-                await Clients.Client(connectionId).SendAsync("ReceiveNotification", notificationDto);
             }
-
         }
-        
-        
+
     }
 }

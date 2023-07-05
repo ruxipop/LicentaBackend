@@ -18,6 +18,7 @@ public interface IImageService
 
    public bool CreateImage(Photo image);
    public void DeleteImage(int id);
+
    public Photo? GetImageByTitle(string url);
 
 }

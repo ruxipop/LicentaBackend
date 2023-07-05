@@ -1,8 +1,11 @@
+using System.Runtime.CompilerServices;
 using BackendLi.Controller.Exceptions;
 using BackendLi.DataAccess;
 using BackendLi.DTOs;
 using BackendLi.Entities;
 using BackendLi.Entities.Attributes;
+using BackendLi.Hubs;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendLi.Services;
@@ -11,15 +14,17 @@ namespace BackendLi.Services;
 public class FollowService:IFollowService
 {
     private readonly IRepository _repository;
+    private readonly ChatHub _chatHubContext;
 
+ 
 
-    public FollowService(IRepository repository)
-    {
+    public FollowService(IRepository repository ){
+
         _repository = repository;
     }
 
-    
-    //cine il urmare pe el
+
+
     public IEnumerable<Follow> GetAllFollowersForUser(int userId)
     {
         return _repository.GetEntities<Follow>().Include(i => i.Follower)
