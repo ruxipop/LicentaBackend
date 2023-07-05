@@ -1,0 +1,9 @@
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\bin\Debug\TestProject2.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\bin\Debug\TestProject2.pdb
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\bin\Debug\nunit.framework.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\bin\Debug\nunit.framework.xml
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\obj\Debug\TestProject2.csproj.AssemblyReference.cache
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\obj\Debug\TestProject2.csproj.CoreCompileInputs.cache
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\obj\Debug\TestProject2.csproj.CopyComplete
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\obj\Debug\TestProject2.dll
+C:\Users\POU2CLJ\Desktop\lic\LicentaBackend\TestProject2\obj\Debug\TestProject2.pdb
