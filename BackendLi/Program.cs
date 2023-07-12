@@ -16,7 +16,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseServiceProviderFactory(new AutofacServiceProviderFactory());
 builder.Host.ConfigureServices(Bootstrapper.ConfigureServices);
 
-// Add services to the container.
 builder.Services.AddConfig<ConnectionStrings>(builder.Configuration.GetSection("ConnectionStrings"));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

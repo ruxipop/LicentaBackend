@@ -11,5 +11,5 @@ public class NotificationDto
     }
 
     public bool? IsFollowing { set; get; }
-  public Notification Notification { set; get; }
+    public Notification Notification { set; get; }
 }

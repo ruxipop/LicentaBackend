@@ -11,7 +11,4 @@ public interface IEditorService
     public EditorChoice GetEditorChoice(int userId, int imageId);
     public bool IsImageVoted(int imageId);
     public int GetNbOfVotes(int userId);
-
-
-
 }

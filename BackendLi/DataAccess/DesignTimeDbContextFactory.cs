@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace BackendLi.DataAccess;
 
-public class DesignTimeDbContextFactory: IDesignTimeDbContextFactory<DataContext>
+public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<DataContext>
 {
     public DataContext CreateDbContext(string[] args)
     {

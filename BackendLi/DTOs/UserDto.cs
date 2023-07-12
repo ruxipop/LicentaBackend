@@ -12,5 +12,4 @@ public class UserDto
 
     public string BackgroundPhoto { get; set; }
     public string ProfilePhoto { get; set; }
-
 }

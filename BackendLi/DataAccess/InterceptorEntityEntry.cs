@@ -1,11 +1,10 @@
-using BackendLi.DataAccess;
 using BackendLi.DataAccess.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace BackendLi.DataAccess;
 
-sealed class InterceptorEntityEntry<T> : IInterceptorEntityEntry<T> where T : class
+internal sealed class InterceptorEntityEntry<T> : IInterceptorEntityEntry<T> where T : class
 {
     private readonly EntityEntry<T> entityEntry;
 
@@ -23,7 +22,7 @@ sealed class InterceptorEntityEntry<T> : IInterceptorEntityEntry<T> where T : cl
     }
 }
 
-sealed class InterceptorEntityEntry : IInterceptorEntityEntry
+internal sealed class InterceptorEntityEntry : IInterceptorEntityEntry
 {
     private readonly EntityEntry entityEntry;
 

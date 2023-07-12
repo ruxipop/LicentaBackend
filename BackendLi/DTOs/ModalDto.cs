@@ -12,6 +12,4 @@ public class ModalDto
 
     public bool IsFollowing { set; get; }
     public User Following { set; get; }
-    
-    
 }

@@ -32,8 +32,4 @@ public enum ImageCategory
     Wedding,
     Other,
     Landscape
-
-
-
-
 }

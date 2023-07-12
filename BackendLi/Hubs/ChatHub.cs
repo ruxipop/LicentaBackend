@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
 using System.Linq;
 using System.Threading.Tasks;
 using BackendLi.DataAccess;
@@ -25,19 +26,15 @@ namespace BackendLi.Hubs
         {
             string username = Context.GetHttpContext().Request.Query["username"];
             Users.Add(Context.ConnectionId, username);
-            Console.WriteLine("User connected: "+username);
             await base.OnConnectedAsync();
         }
 
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            string username = Users.FirstOrDefault(u => u.Key == Context.ConnectionId).Value;
-            Console.WriteLine(username);
+             string username = Users.FirstOrDefault(u => u.Key == Context.ConnectionId).Value;
             if (!string.IsNullOrEmpty(username))
             {
-                Users.Remove(Context.ConnectionId); 
-
-                Console.WriteLine("User disconnected: " + username);
+                Users.Remove(Context.ConnectionId);
             }
 
             await base.OnDisconnectedAsync(exception);
@@ -45,10 +42,7 @@ namespace BackendLi.Hubs
 
         public async Task SendChat(string receiverId,string senderId, string message)
         {
-            if (senderId == null || receiverId == null || message == null)
-            {
-                return;
-            }
+           
             var messageDto = new ChatMessage
             {
                 SenderId = Convert.ToInt32(senderId),
@@ -72,7 +66,7 @@ namespace BackendLi.Hubs
         }
 
 
-        public async Task SendNotification(string receiverId, string senderId, string imageId, NotificationType type)
+        public async Task SendNotification(string receiverId, string senderId, string? imageId, NotificationType type)
         {
             if (senderId!=receiverId)
             {
@@ -80,11 +74,11 @@ namespace BackendLi.Hubs
                 {
                     SenderId = Convert.ToInt32(senderId),
                     ReceiverId = Convert.ToInt32(receiverId),
-                    ImageId = Convert.ToInt32(imageId),
+                    ImageId = imageId ==null? null: Convert.ToInt32(imageId),
                     Timestamp = DateTime.Now,
                     Type = type
                 };
-                _notification.createNotification(notificationDto);
+                _notification.CreateNotification(notificationDto);
                 string connectionId = Users.FirstOrDefault(u => u.Value == receiverId).Key;
                 if (connectionId != null)
                 {

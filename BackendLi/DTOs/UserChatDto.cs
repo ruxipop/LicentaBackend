@@ -12,5 +12,4 @@ public class UserChatDto
 
     public User User { get; set; }
     public DateTime LastMessage { get; set; }
-    
 }

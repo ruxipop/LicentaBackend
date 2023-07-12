@@ -10,9 +10,9 @@ public class Message
 
     public bool IsNew { get; set; }
 
-        
+
     public bool IsSenderDeleted { get; set; }
 
-       
+
     public bool IsReceiverDeleted { get; set; }
 }

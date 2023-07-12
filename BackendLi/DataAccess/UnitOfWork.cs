@@ -10,12 +10,11 @@ namespace BackendLi.DataAccess;
 
 public class UnitOfWork : IUnitOfWork
 {
+    private readonly IDbContextUtilities _contextUtilities;
     private readonly int? _currentUserId;
     private readonly DbContext _dbContext;
-    private IDbContextTransaction _dbContextTransaction;
-
-    private readonly IDbContextUtilities _contextUtilities;
     private readonly IEnumerable<IEntityInterceptor> _globalInterceptors;
+    private IDbContextTransaction _dbContextTransaction;
 
 
     internal UnitOfWork(INewDbContextFactory<DbContext> newDbContextFactory,
@@ -34,24 +33,9 @@ public class UnitOfWork : IUnitOfWork
         _contextUtilities = contextUtilities;
     }
 
-    public Task<T> GetByIdAsync<T>(params object[] keyValues) where T : class
-    {
-        return _dbContext.Set<T>().FindAsync(keyValues).AsTask();
-    }
-
     public IQueryable<T> GetEntities<T>() where T : class
     {
         return _dbContext.Set<T>();
-    }
-        
-    public EntityEntry<T> Entry<T>(T entity) where T : class
-    {
-        return _dbContext.Entry<T>(entity);
-    }
-
-    public IQueryable<T> Query<T>(string sql) where T : class
-    {
-        return _dbContext.Set<T>().FromSqlRaw(sql);
     }
 
     public T GetById<T>(params object[] keyValues) where T : class
@@ -71,10 +55,7 @@ public class UnitOfWork : IUnitOfWork
 
     public void AddRange<T>(IEnumerable<T> entities) where T : class
     {
-        foreach (T entity in entities)
-        {
-            Add(entity);
-        }
+        foreach (var entity in entities) Add(entity);
     }
 
     public void Update<T>(T entity) where T : class
@@ -84,10 +65,7 @@ public class UnitOfWork : IUnitOfWork
 
     public void UpdateRange<T>(IEnumerable<T> entities) where T : class
     {
-        foreach (T entity in entities)
-        {
-            Update(entity);
-        }
+        foreach (var entity in entities) Update(entity);
     }
 
     public void Delete<T>(T entity) where T : class
@@ -97,10 +75,7 @@ public class UnitOfWork : IUnitOfWork
 
     public void DeleteRange<T>(IEnumerable<T> entities) where T : class
     {
-        foreach (T entity in entities)
-        {
-            Delete(entity);
-        }
+        foreach (var entity in entities) Delete(entity);
     }
 
     public void SaveChanges(bool disableInterceptors = false)
@@ -120,12 +95,29 @@ public class UnitOfWork : IUnitOfWork
 #endif
     }
 
+    public void Dispose()
+    {
+        _dbContext.Dispose();
+    }
+
+    public Task<T> GetByIdAsync<T>(params object[] keyValues) where T : class
+    {
+        return _dbContext.Set<T>().FindAsync(keyValues).AsTask();
+    }
+
+    public EntityEntry<T> Entry<T>(T entity) where T : class
+    {
+        return _dbContext.Entry(entity);
+    }
+
+    public IQueryable<T> Query<T>(string sql) where T : class
+    {
+        return _dbContext.Set<T>().FromSqlRaw(sql);
+    }
+
     private void CallSaveChanges(bool disableInterceptors = false)
     {
-        if (!disableInterceptors)
-        {
-            InterceptSave(new List<object>());
-        }
+        if (!disableInterceptors) InterceptSave(new List<object>());
 
         _dbContext.SaveChanges();
         _dbContextTransaction?.Commit();
@@ -133,18 +125,10 @@ public class UnitOfWork : IUnitOfWork
 
     public async Task SaveChangesAsync(bool disableInterceptors = false)
     {
-        if (!disableInterceptors)
-        {
-            InterceptSave(new List<object>());
-        }
+        if (!disableInterceptors) InterceptSave(new List<object>());
 
         await _dbContext.SaveChangesAsync();
         _dbContextTransaction?.Commit();
-    }
-
-    public void Dispose()
-    {
-        _dbContext.Dispose();
     }
 
     public void BeginTransaction()
@@ -186,10 +170,10 @@ public class UnitOfWork : IUnitOfWork
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     public IQueryable<T> ExecuteFunction<T>(string functionName, params object[] parameters) where T : class
     {
-        SqlParameter[] sqlParameters = parameters.Select((x, i) => new SqlParameter($"p{i}", x)).ToArray();
+        var sqlParameters = parameters.Select((x, i) => new SqlParameter($"p{i}", x)).ToArray();
 
-        string sqlCommand = $"select * from {functionName}(" +
-                            string.Join(", ", parameters.Select((x, i) => $"@p{i}")) + ")";
+        var sqlCommand = $"select * from {functionName}(" +
+                         string.Join(", ", parameters.Select((x, i) => $"@p{i}")) + ")";
 
         return _dbContext.Set<T>().FromSqlRaw(sqlCommand, sqlParameters);
     }
@@ -206,26 +190,19 @@ public class UnitOfWork : IUnitOfWork
 
     private void InterceptSave(List<object> interceptedEntities)
     {
-        List<IInterceptorEntityEntry> modifiedAndNotIntercepted = GetModifiedEntities(_dbContext)
+        var modifiedAndNotIntercepted = GetModifiedEntities(_dbContext)
             .Where(e => !interceptedEntities.Contains(e.Entity)).ToList();
 
-        if (modifiedAndNotIntercepted.Count == 0)
-        {
-            return;
-        }
+        if (modifiedAndNotIntercepted.Count == 0) return;
 
-        foreach (IInterceptorEntityEntry entry in modifiedAndNotIntercepted)
+        foreach (var entry in modifiedAndNotIntercepted)
         {
-            object entity = entry.Entity;
+            var entity = entry.Entity;
 
             if (entry.State == EntityEntryState.Added)
-            {
                 Intercept(_globalInterceptors, entry, (i, e) => i.OnAdd(e, this));
-            }
             else if (entry.State == EntityEntryState.Modified)
-            {
                 Intercept(_globalInterceptors, entry, (i, e) => i.OnUpdate(e, this));
-            }
 
             if (!interceptedEntities.Contains(entity))
                 interceptedEntities.Add(entity);
@@ -236,10 +213,10 @@ public class UnitOfWork : IUnitOfWork
 
     private IEnumerable<IInterceptorEntityEntry> GetModifiedEntities(DbContext context)
     {
-        IEnumerable<IInterceptorEntityEntry> modifiedEntities =
+        var modifiedEntities =
             _contextUtilities.GetChangedEntities(context, s => s == EntityState.Added
-                                                              || s == EntityState.Modified
-                                                              || s == EntityState.Deleted);
+                                                               || s == EntityState.Modified
+                                                               || s == EntityState.Deleted);
 
         return modifiedEntities;
     }
@@ -247,11 +224,6 @@ public class UnitOfWork : IUnitOfWork
     private static void Intercept<T>(IEnumerable<T> interceptors, IInterceptorEntityEntry entry,
         Action<T, IInterceptorEntityEntry> intercept)
     {
-        foreach (T interceptor in interceptors)
-        {
-            intercept(interceptor, entry);
-        }
+        foreach (var interceptor in interceptors) intercept(interceptor, entry);
     }
-    
-    
 }

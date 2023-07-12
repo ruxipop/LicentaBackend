@@ -5,10 +5,8 @@ namespace BackendLi.Services;
 
 public interface INotificationService
 {
-
     public IEnumerable<Notification> GetAllNotificationByUserId(int userId, int pageNb, int pageSize);
     public SuccessResponseDto DeleteAllNotifications(int userId);
     public SuccessResponseDto DeleteNotification(int notificationId);
-    public void createNotification(Notification notification);
-
+    public void CreateNotification(Notification notification);
 }

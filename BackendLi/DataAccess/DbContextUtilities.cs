@@ -1,9 +1,8 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace BackendLi.DataAccess;
 
-class DbContextUtilities : IDbContextUtilities
+internal class DbContextUtilities : IDbContextUtilities
 {
     public IEnumerable<IInterceptorEntityEntry> GetChangedEntities(DbContext context,
         Predicate<EntityState> statePredicate)
@@ -16,14 +15,14 @@ class DbContextUtilities : IDbContextUtilities
 
     public IInterceptorEntityEntry GetEntry(object entity, DbContext context)
     {
-        EntityEntry entityEntry = context.Entry(entity);
+        var entityEntry = context.Entry(entity);
 
         return new InterceptorEntityEntry(entityEntry);
     }
 
     public IInterceptorEntityEntry<T> GetEntry<T>(T entity, DbContext context) where T : class
     {
-        EntityEntry<T> entityEntry = context.Entry(entity);
+        var entityEntry = context.Entry(entity);
 
         return new InterceptorEntityEntry<T>(entityEntry);
     }

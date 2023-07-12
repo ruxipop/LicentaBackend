@@ -47,7 +47,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("chat", (string)null);
+                    b.ToTable("chat");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.ChatMessageSender", b =>
@@ -78,7 +78,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("chat_sender", (string)null);
+                    b.ToTable("chat_sender");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Comment", b =>
@@ -106,7 +106,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("comment", (string)null);
+                    b.ToTable("comment");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.EditorChoice", b =>
@@ -131,7 +131,7 @@ namespace BackendLi.Migrations
                     b.HasIndex("ImageId")
                         .IsUnique();
 
-                    b.ToTable("editor", (string)null);
+                    b.ToTable("editor");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Follow", b =>
@@ -152,7 +152,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("FollowingId");
 
-                    b.ToTable("follow", (string)null);
+                    b.ToTable("follow");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Gallery", b =>
@@ -179,7 +179,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("gallery", (string)null);
+                    b.ToTable("gallery");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Like", b =>
@@ -200,7 +200,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("like", (string)null);
+                    b.ToTable("like");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Location", b =>
@@ -217,7 +217,7 @@ namespace BackendLi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("location", (string)null);
+                    b.ToTable("location");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Notification", b =>
@@ -226,9 +226,8 @@ namespace BackendLi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("int");
 
                     b.Property<int>("ReceiverId")
                         .HasColumnType("int");
@@ -244,11 +243,13 @@ namespace BackendLi.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ImageId");
+
                     b.HasIndex("ReceiverId");
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("notification", (string)null);
+                    b.ToTable("notification");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Photo", b =>
@@ -300,7 +301,38 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("image", (string)null);
+                    b.ToTable("image");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("ImageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ImageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("report");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.Token", b =>
@@ -320,7 +352,7 @@ namespace BackendLi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("token", (string)null);
+                    b.ToTable("token");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.User", b =>
@@ -374,7 +406,7 @@ namespace BackendLi.Migrations
 
                     b.HasIndex("LocationId");
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.ChatMessage", b =>
@@ -502,6 +534,10 @@ namespace BackendLi.Migrations
 
             modelBuilder.Entity("BackendLi.Entities.Notification", b =>
                 {
+                    b.HasOne("BackendLi.Entities.Photo", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
                     b.HasOne("BackendLi.Entities.User", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
@@ -513,6 +549,8 @@ namespace BackendLi.Migrations
                         .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Image");
 
                     b.Navigation("Receiver");
 
@@ -540,6 +578,21 @@ namespace BackendLi.Migrations
                     b.Navigation("Gallery");
 
                     b.Navigation("Location");
+                });
+
+            modelBuilder.Entity("BackendLi.Entities.Report", b =>
+                {
+                    b.HasOne("BackendLi.Entities.Photo", "Image")
+                        .WithMany()
+                        .HasForeignKey("ImageId");
+
+                    b.HasOne("BackendLi.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Image");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("BackendLi.Entities.User", b =>

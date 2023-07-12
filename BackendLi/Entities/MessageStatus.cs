@@ -1,3 +1,5 @@
-public enum MessageStatus {
-    RECEIVED, DELIVERED
+public enum MessageStatus
+{
+    RECEIVED,
+    DELIVERED
 }

@@ -6,13 +6,12 @@ namespace BackendLi.Services;
 public interface IUserService
 {
     public void UpdateUser(UserDto userDto);
-        User? GetUser(int UserId);
+    User? GetUser(int UserId);
 
-    User getUserByEmail(string Email);
-    
-    void ResetPassword(string Email, string newPass);
+    User? GetUserByEmail(string Email);
+
+    void ResetPassword(string email, string newPass);
     int GetNumberOfImagesForUser(int userId);
 
     User? GetCurrentUser(HttpRequest request);
-
 }

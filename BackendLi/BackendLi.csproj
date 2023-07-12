@@ -4,6 +4,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>10</LangVersion>
+        <UserSecretsId>e910d62d-4a4d-494b-bceb-212a4cb7cd33</UserSecretsId>
     </PropertyGroup>
 
     <ItemGroup>
@@ -36,6 +38,11 @@
         <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="6.0.2" />
         <PackageReference Include="SixLabors.ImageSharp" Version="3.0.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="publicKeys\" />
+      <Folder Include="secretKeys\" />
     </ItemGroup>
 
 </Project>

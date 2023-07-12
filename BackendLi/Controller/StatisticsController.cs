@@ -15,93 +15,78 @@ public class StatisticsController : ControllerBase
         _statisticsService = statisticsService;
     }
 
-    [AllowAnonymous]
+    [Authorize(Roles = "EDITOR")]
     [HttpGet]
     public IActionResult GetAllStatistics([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        Console.WriteLine("sa");
         return Ok(_statisticsService.GetNumberOfUsers(startDate, endDate));
     }
 
-    [AllowAnonymous]
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("images")]
     public IActionResult GetAllStatisticsImages([FromQuery] DateTime startDate, [FromQuery] DateTime endDate)
     {
-        Console.WriteLine("sas");
         return Ok(_statisticsService.GetNumberOfPhotos(startDate, endDate));
     }
 
 
-    
-    [AllowAnonymous]
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("allRegisteredUsersNb")]
     public IActionResult GetAllRegisteredUsers()
     {
-
         return Ok(_statisticsService.GetAllUsersNb());
-
     }
-    
-    [AllowAnonymous]
+
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("allRegisteredUsers")]
-    public IActionResult GetAllRegisteredUsers([FromQuery] int pageNb,[FromQuery] int pageSize)
+    public IActionResult GetAllRegisteredUsers([FromQuery] int pageNb, [FromQuery] int pageSize)
     {
-
-        return Ok(_statisticsService.GetAllUsers(pageNb,pageSize));
-
+        return Ok(_statisticsService.GetAllUsers(pageNb, pageSize));
     }
-    
-    [AllowAnonymous]
+
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("newlyRegisteredUsersNb")]
     public IActionResult GetNewUserNb()
     {
-
         return Ok(_statisticsService.GetNewUserNb());
-
     }
-    
-    [AllowAnonymous]
+
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("newlyRegisteredUsers")]
-    public IActionResult GetNewUsers([FromQuery] int pageNb,[FromQuery] int pageSize)
+    public IActionResult GetNewUsers([FromQuery] int pageNb, [FromQuery] int pageSize)
     {
-
-        return Ok(_statisticsService.GetNewUsers(pageNb,pageSize));
-
+        return Ok(_statisticsService.GetNewUsers(pageNb, pageSize));
     }
-    
-    [AllowAnonymous]
+
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("newlyUploadedImages")]
-    public IActionResult GetNewImages([FromQuery] int pageNb,[FromQuery] int pageSize)
+    public IActionResult GetNewImages([FromQuery] int pageNb, [FromQuery] int pageSize)
     {
-
-        return Ok(_statisticsService.GetNewImages(pageNb,pageSize));
-
+        return Ok(_statisticsService.GetNewImages(pageNb, pageSize));
     }
-    
-    [AllowAnonymous]
+
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("allUploadedImages")]
-    public IActionResult GetAllUploadedImages([FromQuery] int pageNb,[FromQuery] int pageSize)
+    public IActionResult GetAllUploadedImages([FromQuery] int pageNb, [FromQuery] int pageSize)
     {
-
-        return Ok(_statisticsService.GetAllImages(pageNb,pageSize));
-
+        return Ok(_statisticsService.GetAllImages(pageNb, pageSize));
     }
 
-    [AllowAnonymous]
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("getStatisticsByType")]
     public IActionResult GetStatisticsByType()
     {
         return Ok(_statisticsService.GetStatisticsByType());
     }
-    
-    [AllowAnonymous]
+
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("getStatisticsByCategory")]
     public IActionResult GetStatisticsByCategory()
     {
         return Ok(_statisticsService.GetStatisticsByCategory());
     }
-    
-    [AllowAnonymous]
+
+    [Authorize(Roles = "EDITOR")]
     [HttpGet("getFirstImages")]
     public IActionResult GetFirst()
     {

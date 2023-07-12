@@ -1,10 +1,8 @@
-
 using BackendLi.Entities.Attributes;
 using BackendLi.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace BackendLi.DataAccess;
-
 
 [Service(typeof(INewDbContextFactory<DbContext>))]
 public class NewDbContextFactory : INewDbContextFactory<DbContext>
@@ -18,11 +16,6 @@ public class NewDbContextFactory : INewDbContextFactory<DbContext>
 
     public DbContext CreateDbContext()
     {
-        
-      
         return new DataContext(connectionStrings.Database);
     }
-    
-
-    
 }

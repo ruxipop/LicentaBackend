@@ -1,15 +1,14 @@
 using System.Diagnostics.CodeAnalysis;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
-using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.Data.SqlClient;
-namespace BackendLi.DataAccess;
 
+namespace BackendLi.DataAccess;
 
 public class BaseRepository : IRepository
 {
-    private readonly INewDbContextFactory<DbContext> _dbContextFactory;
     private readonly DbContext _dbContext;
+    private readonly INewDbContextFactory<DbContext> _dbContextFactory;
     private readonly IInterceptorsResolver _interceptorsResolver;
     private int? _currentUserId;
 
@@ -21,6 +20,21 @@ public class BaseRepository : IRepository
         _currentUserId = null;
     }
 
+    public IQueryable<T> GetEntities<T>() where T : class
+    {
+        return _dbContext.Set<T>().AsNoTracking();
+    }
+
+    public IUnitOfWork CreateUnitOfWork()
+    {
+        return new UnitOfWork(_dbContextFactory, _interceptorsResolver, _currentUserId);
+    }
+
+    public T GetById<T>(params object[] keyValues) where T : class
+    {
+        return _dbContext.Set<T>().Find(keyValues);
+    }
+
     public Task<T> GetByIdAsync<T>(params object[] keyValues) where T : class
     {
         return _dbContext.Set<T>().FindAsync(keyValues).AsTask();
@@ -28,22 +42,12 @@ public class BaseRepository : IRepository
 
     public EntityEntry<T> Entry<T>(T entity) where T : class
     {
-        return _dbContext.Entry<T>(entity);
-    }
-
-    public IQueryable<T> GetEntities<T>() where T : class
-    {
-        return _dbContext.Set<T>().AsNoTracking();
+        return _dbContext.Entry(entity);
     }
 
     public IQueryable<T> Query<T>(string sql) where T : class
     {
         return _dbContext.Set<T>().FromSqlRaw(sql);
-    }
-
-    public IUnitOfWork CreateUnitOfWork()
-    {
-        return new UnitOfWork(_dbContextFactory, _interceptorsResolver, _currentUserId);
     }
 
     public void SetCommandTimeout(int seconds)
@@ -58,10 +62,10 @@ public class BaseRepository : IRepository
 
     public string GetTableName<T>() where T : class
     {
-        IEntityType entityType = _dbContext.Model.FindEntityType(typeof(T));
-        string schema = entityType.GetSchema();
-        string tableName = entityType.GetTableName();
-            
+        var entityType = _dbContext.Model.FindEntityType(typeof(T));
+        var schema = entityType.GetSchema();
+        var tableName = entityType.GetTableName();
+
         return string.IsNullOrEmpty(schema) ? $"[{tableName}]" : $"[{schema}].[{tableName}]";
     }
 
@@ -69,17 +73,11 @@ public class BaseRepository : IRepository
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     public IQueryable<T> ExecuteFunction<T>(string functionName, params object[] parameters) where T : class
     {
-        SqlParameter[] sqlParameters = parameters.Select((x, i) => new SqlParameter($"p{i}", x)).ToArray();
+        var sqlParameters = parameters.Select((x, i) => new SqlParameter($"p{i}", x)).ToArray();
 
-        string sqlCommand = $"SELECT * FROM {functionName}(" +
-                            string.Join(", ", parameters.Select((x, i) => $"@p{i}")) + ")";
+        var sqlCommand = $"SELECT * FROM {functionName}(" +
+                         string.Join(", ", parameters.Select((x, i) => $"@p{i}")) + ")";
 
         return _dbContext.Set<T>().FromSqlRaw(sqlCommand, sqlParameters);
     }
-
-    public T GetById<T>(params object[] keyValues) where T : class
-    {
-        return _dbContext.Set<T>().Find(keyValues);
-    }
-    
 }
