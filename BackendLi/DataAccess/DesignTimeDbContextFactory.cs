@@ -7,6 +7,6 @@ public class DesignTimeDbContextFactory : IDesignTimeDbContextFactory<DataContex
 {
     public DataContext CreateDbContext(string[] args)
     {
-        return new DataContext("server=localhost;database=vizo_db;user=root;password=root;PersistSecurityInfo=True");
+        return new DataContext("server=eu-cdbr-west-03.cleardb.net;database=heroku_b1ac73683ad42cb;user=bad24ad5363e70;password=7fca4e2b");
     }
 }
