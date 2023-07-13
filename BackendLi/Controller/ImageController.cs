@@ -203,9 +203,11 @@ public class ImageController : ControllerBase
 
         var results = _searcher.ReadFile(imageTitle);
         foreach (var result in results)
-            if (!result.Item2.Equals(imageTitle))
+        {
+            
                 list.Add(_imageService.GetImageByTitle(result.Item2)!);
-
+            
+        }
 
         return Ok(list);
     }

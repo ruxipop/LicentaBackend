@@ -28,14 +28,17 @@ public class Searcher
 
         foreach (var line in lines)
         {
-            float[] features;
+            if (line != searchedLine)
+            {
+                float[] features;
 
-            var row = line.Split(' ');
+                var row = line.Split(' ');
 
-            var imageId = row[0];
-            features = row.Skip(1).Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
-            var distance = ChiSquaredDistance(queryFeatures, features);
-            results.Add((distance, imageId));
+                var imageId = row[0];
+                features = row.Skip(1).Select(s => float.Parse(s, CultureInfo.InvariantCulture)).ToArray();
+                var distance = ChiSquaredDistance(queryFeatures, features);
+                results.Add((distance, imageId));
+            }
         }
 
 

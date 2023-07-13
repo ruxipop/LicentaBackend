@@ -53,6 +53,11 @@ public class StatisticsService : IStatisticsService
     {
         return _repository.GetEntities<User>().Count();
     }
+    
+    public int GetAllImagesNb()
+    {
+        return _repository.GetEntities<Photo>().Count();
+    }
 
     public IEnumerable<User> GetAllUsers(int pageNb, int pageSize)
     {
@@ -65,6 +70,14 @@ public class StatisticsService : IStatisticsService
         var startDate = endDate.AddDays(-7);
         return _repository.GetEntities<User>()
             .Count(u => u.RegisterDate >= startDate && u.RegisterDate <= endDate);
+    }
+    
+    public int GetNewImagesNb()
+    {
+        var endDate = DateTime.Now;
+        var startDate = endDate.AddDays(-7);
+        return _repository.GetEntities<Photo>()
+            .Count(u => u.Uploaded >= startDate && u.Uploaded <= endDate);
     }
 
     public IEnumerable<User> GetNewUsers(int pageNb, int pageSize)

@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  net-api:
+    container_name: net-api
+    build: .
+    ports:
+      - "7290:7290"
+      - "5236:5236"
+    networks:
+      sd-net:
+        ipv4_address: 172.21.0.108
+    environment:
+      - ASPNETCORE_HTTP_PORT=http://+:5236
+      - ASPNETCORE_URLS=http://+:5236
+    command: ["dotnet", "BackendLi.dll"]
+
+networks:
+  sd-net:
+    external: true

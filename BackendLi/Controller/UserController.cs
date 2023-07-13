@@ -182,6 +182,7 @@ public class UserController : ControllerBase
     [Authorize]
     public IActionResult Update([FromBody] UserDto user)
     {
+        Console.WriteLine("akund");
         _userService.UpdateUser(user);
 
         return Ok();

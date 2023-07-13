@@ -8,6 +8,8 @@ public interface IStatisticsService
     public IEnumerable<int> GetNumberOfUsers(DateTime startDate, DateTime endDate);
     public IEnumerable<User> GetAllUsers(int pageNb, int pageSize);
     public int GetAllUsersNb();
+    public int GetAllImagesNb();
+    public int GetNewImagesNb();
     public int GetNewUserNb();
     public IEnumerable<User> GetNewUsers(int pageNb, int pageSize);
     public IEnumerable<Photo> GetNewImages(int pageNb, int pageSize);

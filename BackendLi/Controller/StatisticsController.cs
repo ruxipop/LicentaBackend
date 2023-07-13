@@ -29,6 +29,19 @@ public class StatisticsController : ControllerBase
         return Ok(_statisticsService.GetNumberOfPhotos(startDate, endDate));
     }
 
+    [Authorize(Roles = "EDITOR")]
+    [HttpGet("allImagesNb")]
+    public IActionResult GetAllImagesNb()
+    {
+        return Ok(_statisticsService.GetAllImagesNb());
+    }
+    
+    [Authorize(Roles = "EDITOR")]
+    [HttpGet("allNewImagesNb")]
+    public IActionResult GetNewImagesNb()
+    {
+        return Ok(_statisticsService.GetNewImagesNb());
+    }
 
     [Authorize(Roles = "EDITOR")]
     [HttpGet("allRegisteredUsersNb")]
